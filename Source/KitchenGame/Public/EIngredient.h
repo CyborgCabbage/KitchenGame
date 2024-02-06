@@ -9,6 +9,7 @@
  */
 UENUM(BlueprintType)
 enum class EIngredient : uint8 {
+	EI_NONE UMETA(DisplayName = "None"),
 	EI_BREAD UMETA(DisplayName = "Bread"),
 	EI_BREAD_SLICE UMETA(DisplayName = "Bread Slice"),
 	EI_EYEBALL UMETA(DisplayName = "Eyeball"),
