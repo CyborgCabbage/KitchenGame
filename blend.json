@@ -1,0 +1,12 @@
+[
+	{
+		"Name": "SmoothieRecipe",
+		"RecipeInput": [
+			"eyeball",
+			"milk"
+		],
+		"RecipeOutput": [
+			"smoothie"
+		]
+	}
+]
