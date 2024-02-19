@@ -1,0 +1,11 @@
+[
+	{
+		"Name": "PotatoChipRecipe",
+		"RecipeInput": [
+			"potato"
+		],
+		"RecipeOutput": [
+			"potatoChip"
+		]
+	}
+]
