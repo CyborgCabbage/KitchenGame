@@ -2,10 +2,10 @@
 	{
 		"Name": "PotatoChipRecipe",
 		"RecipeInput": [
-			"potato"
+			"BP_Potato_C"
 		],
 		"RecipeOutput": [
-			"potatoChip"
+			"BP_PotatoChip_C"
 		]
 	}
 ]
