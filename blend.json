@@ -2,11 +2,21 @@
 	{
 		"Name": "SmoothieRecipe",
 		"RecipeInput": [
-			"eyeball",
-			"milk"
+			"BP_Eyeball_C",
+			"BP_Milk_C"
 		],
 		"RecipeOutput": [
-			"smoothie"
+			"BP_Smoothie_C"
+		]
+	},
+	{
+		"Name": "TestRecipe",
+		"RecipeInput": [
+			"BP_Potato_C",
+			"BP_Potato_C"
+		],
+		"RecipeOutput": [
+			"BP_Bread_C"
 		]
 	}
 ]

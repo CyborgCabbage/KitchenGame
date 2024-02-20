@@ -28,6 +28,24 @@ public:
     TArray<FString> RecipeOutput;
 };
 
+USTRUCT(BlueprintType)
+struct FTryRecipeResult
+{
+    GENERATED_USTRUCT_BODY()
+
+    /**  */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    bool Success;
+
+    /** */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TArray<TSubclassOf<AActor>> ToCreate;
+
+    /** */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    TArray<AActor*> ToDestroy;
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class KITCHENGAME_API URecipeManager : public UObject
 {
@@ -37,10 +55,10 @@ public:
 	~URecipeManager();
 
     UFUNCTION(BlueprintCallable, Category = Recipe)
-    void RegisterIngredient(FString ingredientId, TSubclassOf<AActor> ingredientClass);
+    FTryRecipeResult TryChop(AActor* ingredient);
 
     UFUNCTION(BlueprintCallable, Category = Recipe)
-    TSubclassOf<AActor> TryChop(FString ingredientId);
+    FTryRecipeResult TryBlend(const TArray<AActor*>& ingredients);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* ChopTable;
@@ -48,7 +66,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* BlendTable;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<TSubclassOf<AActor>> IngredientClasses;
+
 private:
+    void InitClassTable();
+
     UPROPERTY()
-    TMap<FString, TSubclassOf<AActor>> IdToClass;
+    TMap<FString, TSubclassOf<AActor>> NameToClass;
 };
