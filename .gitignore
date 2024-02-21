@@ -73,3 +73,4 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 Content/StarterContent/HDRI/HDRI_Epic_Courtyard_Daylight.uasset
+enc_temp_folder/**
