@@ -2,6 +2,7 @@
 
 
 #include "URecipeManager.h"
+#include "Engine/GameEngine.h"
 
 URecipeManager::URecipeManager()
 {
@@ -114,6 +115,33 @@ FTryRecipeResult URecipeManager::TryBlend(const TArray<AActor*>& ingredients)
 		return result;
 	}
 	return result;
+}
+
+bool URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch)
+{
+	//Convert actors to classes
+	TArray<FString> presentedNames;
+	for (AActor* Actor : presented) {
+		presentedNames.Add(Actor->GetClass()->GetName());
+	}
+	//Find sub array
+	for (int i = 0; i < presentedNames.Num(); i++) {
+		for (int j = 0; j < toMatch.ResultStack.Num(); j++) {
+			//No more room
+			if (i + j >= presentedNames.Num()) {
+				return false;
+			}
+			//Break if they don't match
+			if (presentedNames[i + j] != toMatch.ResultStack[j]) {
+				break;
+			}
+			//If we made it to the end confirm match and return true
+			if (j == toMatch.ResultStack.Num() - 1) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void URecipeManager::InitClassTable()

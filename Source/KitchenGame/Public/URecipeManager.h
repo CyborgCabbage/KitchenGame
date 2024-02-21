@@ -10,6 +10,21 @@
  */
 
 USTRUCT(BlueprintType)
+struct FPresentationRecipe : public FTableRowBase
+{
+    GENERATED_USTRUCT_BODY()
+
+public:
+
+    FPresentationRecipe()
+    {}
+
+    /** The stack of ingredients and utensils that should be on the presentation bench */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
+    TArray<FString> ResultStack;
+};
+
+USTRUCT(BlueprintType)
 struct FCookingRecipe : public FTableRowBase
 {
     GENERATED_USTRUCT_BODY()
@@ -60,11 +75,17 @@ public:
     UFUNCTION(BlueprintCallable, Category = Recipe)
     FTryRecipeResult TryBlend(const TArray<AActor*>& ingredients);
 
+    UFUNCTION(BlueprintCallable, Category = Recipe)
+    bool TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch);
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* ChopTable;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* BlendTable;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UDataTable* PresentTable;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<TSubclassOf<AActor>> IngredientClasses;
