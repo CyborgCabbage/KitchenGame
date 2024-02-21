@@ -23,11 +23,11 @@ public:
 
 	/** How well done this ingredient is, a value over 1 means burnt */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-	double Doneness;
+	double DoneAmount;
 
 	/** How well fried this is, a value over 1 means over-fried */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-	double Friedness;
+	double FryAmount;
 
 	/** How long it takes to go from 0 to 1 in doneness */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
