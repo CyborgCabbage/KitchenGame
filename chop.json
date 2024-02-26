@@ -7,5 +7,32 @@
 		"RecipeOutput": [
 			"BP_PotatoChip_C"
 		]
+	},
+	{
+		"Name": "TomatoSliceRecipe",
+		"RecipeInput": [
+			"BP_Tomato_C"
+		],
+		"RecipeOutput": [
+			"BP_TomatoSlice_C"
+		]
+	},
+	{
+		"Name": "BreadSliceRecipe",
+		"RecipeInput": [
+			"BP_Bread_C"
+		],
+		"RecipeOutput": [
+			"BP_BreadSlice_C"
+		]
+	},
+	{
+		"Name": "EyeballSliceRecipe",
+		"RecipeInput": [
+			"BP_Eyeball_C"
+		],
+		"RecipeOutput": [
+			"BP_EyeballSlice_C"
+		]
 	}
 ]
