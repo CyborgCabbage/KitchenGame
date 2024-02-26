@@ -3,6 +3,7 @@
 
 #include "URecipeManager.h"
 #include "Engine/GameEngine.h"
+#include "AIngredient.h"
 
 URecipeManager::URecipeManager()
 {
@@ -119,20 +120,15 @@ FTryRecipeResult URecipeManager::TryBlend(const TArray<AActor*>& ingredients)
 
 bool URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch)
 {
-	//Convert actors to classes
-	TArray<FString> presentedNames;
-	for (AActor* Actor : presented) {
-		presentedNames.Add(Actor->GetClass()->GetName());
-	}
 	//Find sub array
-	for (int i = 0; i < presentedNames.Num(); i++) {
+	for (int i = 0; i < presented.Num(); i++) {
 		for (int j = 0; j < toMatch.ResultStack.Num(); j++) {
 			//No more room
-			if (i + j >= presentedNames.Num()) {
+			if (i + j >= presented.Num()) {
 				return false;
 			}
 			//Break if they don't match
-			if (presentedNames[i + j] != toMatch.ResultStack[j]) {
+			if (!MatchPresented(presented[i+j], toMatch.ResultStack[j])) {
 				break;
 			}
 			//If we made it to the end confirm match and return true
@@ -142,6 +138,22 @@ bool URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresent
 		}
 	}
 	return false;
+}
+
+bool URecipeManager::MatchPresented(const AActor* presented, FString toMatch)
+{
+	FString ActorName = presented->GetClass()->GetName();
+	//Parse match string
+	FJsonSerializableArray MatchTerms;
+	toMatch.ParseIntoArray(MatchTerms, TEXT(","));
+	//Match phase if it is an ingredient and a phase is specified
+	const AIngredient* Ingredient = Cast<AIngredient>(presented);
+	if (Ingredient && MatchTerms.Num() > 1) {
+		if (Ingredient->GetPhase() != MatchTerms[1]) {
+			return false;
+		}
+	}
+	return ActorName == MatchTerms[0];
 }
 
 void URecipeManager::InitClassTable()
