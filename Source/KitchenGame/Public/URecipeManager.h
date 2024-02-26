@@ -91,6 +91,9 @@ public:
     TArray<TSubclassOf<AActor>> IngredientClasses;
 
 private:
+
+    bool MatchPresented(const AActor* presented, FString toMatch);
+
     void InitClassTable();
 
     UPROPERTY()

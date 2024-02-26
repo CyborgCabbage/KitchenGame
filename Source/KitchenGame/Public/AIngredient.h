@@ -6,6 +6,30 @@
 #include "GameFramework/Actor.h"
 #include "AIngredient.generated.h"
 
+USTRUCT(BlueprintType)
+struct FIngredientStatus
+{
+	GENERATED_USTRUCT_BODY()
+	
+	FIngredientStatus();
+
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Cooked;
+
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Fried;
+	
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Burnt;
+
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float OverFried;
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class KITCHENGAME_API AIngredient : public AActor
 {
@@ -20,32 +44,51 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-
-	/** How well done this ingredient is, a value over 1 means burnt */
+	//Properties
+	
+	/** How cooked is this ingredient */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-	double DoneAmount;
+	double CookAmount;
 
-	/** How well fried this is, a value over 1 means over-fried */
+	/** How fried is this ingredient */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	double FryAmount;
-
-	/** How long it takes to go from 0 to 1 in doneness */
+	
+	//Cooking Times
+	
+	/** How long it takes to cook */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-	double DoneTime;
+	double CookTime;
+
+	/** How long before it starts burning */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	double CookedTime;
 
 	/** How long it takes to burn */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	double BurnTime;
 
-	/** How long it takes to go from 0 to 1 in friedness */
+	//Frying Times
+
+	/** How long it takes to fry */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	double FryTime;
 
-	/** How long it takes to over-fry */
+	/** How long before it starts burning */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	double FriedTime;
+
+	/** How long it takes to over fry */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	double OverFryTime;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = Recipe)
+	FIngredientStatus GetStatus() const;
+
+	UFUNCTION(BlueprintCallable, Category = Recipe)
+	FString GetPhase() const;
 
 };
