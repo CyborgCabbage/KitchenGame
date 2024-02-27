@@ -12,7 +12,8 @@ AIngredient::AIngredient() :
 	BurnTime(10),
 	FryTime(10),
 	FriedTime(10),
-	OverFryTime(10)
+	OverFryTime(10),
+	IngredientID("")
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
