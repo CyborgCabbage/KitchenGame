@@ -47,40 +47,44 @@ public:
 	//Properties
 	
 	/** How cooked is this ingredient */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient State")
 	double CookAmount;
 
 	/** How fried is this ingredient */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient State")
 	double FryAmount;
 	
 	//Cooking Times
 	
 	/** How long it takes to cook */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	double CookTime;
 
 	/** How long before it starts burning */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	double CookedTime;
 
 	/** How long it takes to burn */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	double BurnTime;
 
 	//Frying Times
 
 	/** How long it takes to fry */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	double FryTime;
 
 	/** How long before it starts burning */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	double FriedTime;
 
 	/** How long it takes to over fry */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	double OverFryTime;
+
+	/** The ID of the ingredient */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
+	FString IngredientID;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
