@@ -6,5 +6,25 @@
 			"BP_PotatoChip_C,fried"
 			
 		]
+	},
+	{
+		"Name": "Burger",
+		"ResultStack": [
+			"BP_Plate_C",
+			"BP_BreadSlice_C,cooked",
+			"BP_Mince_C,cooked",
+			"BP_TomatoSlice_C",
+			"BP_LettuceSlice_C",
+			"BP_BreadSlice_C,cooked"
+			
+		]
+	},
+	{
+		"Name": "EyeballToast",
+		"ResultStack": [
+			"BP_Plate_C",
+			"BP_BreadSlice_C,cooked",
+			"BP_EyeballSlice_C"
+		]
 	}
 ]
