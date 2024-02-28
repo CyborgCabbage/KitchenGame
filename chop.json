@@ -34,5 +34,14 @@
 		"RecipeOutput": [
 			"BP_EyeballSlice_C"
 		]
+	},
+	{
+		"Name": "LettuceSliceRecipe",
+		"RecipeInput": [
+			"BP_Lettuce_C"
+		],
+		"RecipeOutput": [
+			"BP_LettuceSlice_C"
+		]
 	}
 ]
