@@ -44,4 +44,7 @@ public:
 
 	UPROPERTY(EditInstanceOnly)
 	TArray<FStockQuota> StockQuotas;
+
+	UPROPERTY(EditAnywhere)
+	FVector SpawnDisplacement;
 };
