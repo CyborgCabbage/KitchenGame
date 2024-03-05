@@ -22,6 +22,10 @@ public:
     /** The stack of ingredients and utensils that should be on the presentation bench */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
     TArray<FString> ResultStack;
+
+    /** How long the player will have to complete the recipe*/
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
+    int TimeSeconds;
 };
 
 USTRUCT(BlueprintType)

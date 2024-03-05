@@ -4,8 +4,8 @@
 		"ResultStack": [
 			"BP_Plate_C",
 			"BP_PotatoChip_C,fried"
-			
-		]
+		],
+		"TimeSeconds": 120
 	},
 	{
 		"Name": "Burger",
@@ -16,8 +16,8 @@
 			"BP_TomatoSlice_C",
 			"BP_LettuceSlice_C",
 			"BP_BreadSlice_C,cooked"
-			
-		]
+		],
+		"TimeSeconds": 150
 	},
 	{
 		"Name": "EyeballToast",
@@ -25,6 +25,7 @@
 			"BP_Plate_C",
 			"BP_BreadSlice_C,cooked",
 			"BP_EyeballSlice_C"
-		]
+		],
+		"TimeSeconds": 180
 	}
 ]
