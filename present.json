@@ -17,7 +17,7 @@
 			"BP_LettuceSlice_C",
 			"BP_BreadSlice_C,cooked"
 		],
-		"TimeSeconds": 150
+		"TimeSeconds": 180
 	},
 	{
 		"Name": "EyeballToast",
@@ -26,6 +26,6 @@
 			"BP_BreadSlice_C,cooked",
 			"BP_EyeballSlice_C"
 		],
-		"TimeSeconds": 180
+		"TimeSeconds": 150
 	}
 ]
