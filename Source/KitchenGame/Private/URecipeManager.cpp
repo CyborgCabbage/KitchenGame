@@ -118,14 +118,18 @@ FTryRecipeResult URecipeManager::TryBlend(const TArray<AActor*>& ingredients)
 	return result;
 }
 
-bool URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch)
+const FScoreDeduction DeductIncorrect{ 5000, TEXT("Incorrect") };
+
+TArray<FScoreDeduction> URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch)
 {
+	TArray<FScoreDeduction> Deductions;
 	//Find sub array
 	for (int i = 0; i < presented.Num(); i++) {
 		for (int j = 0; j < toMatch.ResultStack.Num(); j++) {
 			//No more room
 			if (i + j >= presented.Num()) {
-				return false;
+				Deductions.Add(DeductIncorrect);
+				return Deductions;
 			}
 			//Break if they don't match
 			if (!MatchPresented(presented[i+j], toMatch.ResultStack[j])) {
@@ -133,11 +137,12 @@ bool URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresent
 			}
 			//If we made it to the end confirm match and return true
 			if (j == toMatch.ResultStack.Num() - 1) {
-				return true;
+				return Deductions;
 			}
 		}
 	}
-	return false;
+	Deductions.Add(DeductIncorrect);
+	return Deductions;
 }
 
 bool URecipeManager::MatchPresented(const AActor* presented, FString toMatch)

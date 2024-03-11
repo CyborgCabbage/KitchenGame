@@ -65,6 +65,25 @@ struct FTryRecipeResult
     TArray<AActor*> ToDestroy;
 };
 
+USTRUCT(BlueprintType)
+struct FScoreDeduction
+{
+    GENERATED_USTRUCT_BODY()
+    FScoreDeduction() : FScoreDeduction(0, TEXT("None"))
+    {}
+
+    FScoreDeduction(int ScoreDelta, const FString& Reason) : ScoreDelta(ScoreDelta), Reason(Reason)
+    {}
+
+    /**  */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int ScoreDelta;
+
+    /** */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString Reason;
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class KITCHENGAME_API URecipeManager : public UObject
 {
@@ -80,7 +99,7 @@ public:
     FTryRecipeResult TryBlend(const TArray<AActor*>& ingredients);
 
     UFUNCTION(BlueprintCallable, Category = Recipe)
-    bool TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch);
+    TArray<FScoreDeduction> TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* ChopTable;
