@@ -3,7 +3,6 @@
 
 #include "URecipeManager.h"
 #include "Engine/GameEngine.h"
-#include "AIngredient.h"
 
 URecipeManager::URecipeManager()
 {
@@ -118,48 +117,125 @@ FTryRecipeResult URecipeManager::TryBlend(const TArray<AActor*>& ingredients)
 	return result;
 }
 
-const FScoreDeduction DeductIncorrect{ 5000, TEXT("Incorrect") };
+URecipeManager::MatchRequirement URecipeManager::ParseMatchString(const FString& String)
+{
+	FJsonSerializableArray MatchTerms;
+	String.ParseIntoArray(MatchTerms, TEXT(","));
+	return { MatchTerms[0], MatchTerms.IsValidIndex(1) ? TOptional{MatchTerms[1]} : NullOpt };
+}
+
+URecipeManager::MatchStatus URecipeManager::MatchItem(AIngredient* Presented, MatchRequirement Requirement)
+{
+	FString ActorName = Presented->GetClass()->GetName();
+	//Parse match string
+	
+	bool CorrectItem = (ActorName == Requirement.ClassName);
+	if (CorrectItem) {
+		//Match phase if it is an ingredient and a phase is specified
+		if (!Requirement.Phase) {
+			return MatchStatus::Perfect;
+		}
+		if (Presented->GetPhase() == Requirement.Phase.GetValue()) {
+			return MatchStatus::Perfect;
+		}
+		else {
+			return MatchStatus::WrongPhase;
+		}
+	}
+	else{
+		//Check if the chopped version would be correct
+		auto ChopResult = TryChop(Presented);
+		if (ChopResult.Success) {
+			if (ChopResult.ToCreate[0].Get()->GetName() == Requirement.ClassName) {
+				return MatchStatus::NotChopped;
+			}
+		}
+		return MatchStatus::WrongItem;
+	}
+}
+
+const int DeductNoPlate{ 500 };
+const int DeductWrongPhase{ 1000 };
+const int DeductNotChopped{ 2000 };
+const int DeductMissingItem{ 2500 };
+const int DeductExtraItem{ 2000 };
+const int DeductOutOfOrder{ 1000 };
 
 TArray<FScoreDeduction> URecipeManager::TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch)
 {
+	
 	TArray<FScoreDeduction> Deductions;
-	//Find sub array
-	for (int i = 0; i < presented.Num(); i++) {
-		for (int j = 0; j < toMatch.ResultStack.Num(); j++) {
-			//No more room
-			if (i + j >= presented.Num()) {
-				Deductions.Add(DeductIncorrect);
-				return Deductions;
-			}
-			//Break if they don't match
-			if (!MatchPresented(presented[i+j], toMatch.ResultStack[j])) {
+	FString ActorName = presented[0]->GetClass()->GetName();
+	if (ActorName != "BP_Plate_C") {
+		Deductions.Add({ DeductNoPlate, TEXT("No plate") });
+	}
+	//Get ingredients
+	TArray<AIngredient*> PresentedIngredients;
+	for (AActor* PresentedActor : presented) {
+		auto* ingredient = Cast<AIngredient>(PresentedActor);
+		if (ingredient) {
+			PresentedIngredients.Add(ingredient);
+		}
+	}
+	//Match up
+	
+	struct MatchInfo {
+		AIngredient* Ref;
+		MatchStatus Status;
+		int Index;
+	};
+	
+	TArray<TPair<MatchInfo, MatchRequirement>> Matched;
+	for (const auto& TM : toMatch.ResultStack) {
+		Matched.Add({ 
+			MatchInfo{nullptr, MatchStatus::WrongItem, -1}, 
+			ParseMatchString(TM)
+		});
+	}
+	for (int i = 0; i < Matched.Num(); i++) {
+		for (int j = 0; j < PresentedIngredients.Num(); j++) {
+			MatchStatus Status = MatchItem(PresentedIngredients[j], Matched[i].Value);
+			if (Status != MatchStatus::WrongItem) {
+				Matched[i].Key = { PresentedIngredients[j], Status, j};
+				PresentedIngredients.RemoveAt(j);
 				break;
-			}
-			//If we made it to the end confirm match and return true
-			if (j == toMatch.ResultStack.Num() - 1) {
-				return Deductions;
 			}
 		}
 	}
-	Deductions.Add(DeductIncorrect);
+	// PresentedIngredients no contains items that were presented but don't correspond to anything in the recipe.
+	if (!PresentedIngredients.IsEmpty()) {
+		Deductions.Add({ DeductExtraItem, TEXT("Extra ingredient(s)") });
+	}
+	// MatchedPresented contains presented items that could be matched up to something in the recipe
+	int PreviousIndex = -1;
+	bool IncorrectOrder = false;
+	for (const TPair<MatchInfo, MatchRequirement>& Info : Matched) {
+		if (Info.Key.Ref) {
+			//Check out of order
+			if (Info.Key.Index < PreviousIndex) {
+				IncorrectOrder = true;
+			}
+			PreviousIndex = Info.Key.Index;
+			//Deduct as appropriate
+			if (Info.Key.Status == MatchStatus::WrongPhase) Deductions.Add({ DeductWrongPhase, FString::Printf(TEXT("'%s' should have been '%s' not '%s'"), *Info.Key.Ref->IngredientID, *Info.Value.Phase.GetValue(), *Info.Key.Ref->GetPhase())});
+			if (Info.Key.Status == MatchStatus::NotChopped) Deductions.Add({ DeductNotChopped, FString::Printf(TEXT("'%s' should have been chopped"), *Info.Key.Ref->IngredientID) });
+		}
+		else {
+			Deductions.Add({ DeductMissingItem, FString::Printf(TEXT("'%s' was missing"), *Info.Value.ClassName) });
+		}
+	}
+	if (IncorrectOrder) {
+		Deductions.Add({ DeductOutOfOrder, TEXT("Out of order") });
+	}
 	return Deductions;
 }
 
-bool URecipeManager::MatchPresented(const AActor* presented, FString toMatch)
+int URecipeManager::GetMaxDeductions(const FPresentationRecipe& toMatch)
 {
-	FString ActorName = presented->GetClass()->GetName();
-	//Parse match string
-	FJsonSerializableArray MatchTerms;
-	toMatch.ParseIntoArray(MatchTerms, TEXT(","));
-	//Match phase if it is an ingredient and a phase is specified
-	const AIngredient* Ingredient = Cast<AIngredient>(presented);
-	if (Ingredient && MatchTerms.Num() > 1) {
-		if (Ingredient->GetPhase() != MatchTerms[1]) {
-			return false;
-		}
-	}
-	return ActorName == MatchTerms[0];
+	return DeductExtraItem + DeductMissingItem * toMatch.ResultStack.Num();
 }
+
+
 
 void URecipeManager::InitClassTable()
 {

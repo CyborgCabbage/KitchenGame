@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "AIngredient.h"
 #include "URecipeManager.generated.h"
 /**
  * 
@@ -101,6 +102,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = Recipe)
     TArray<FScoreDeduction> TryPresent(const TArray<AActor*>& presented, const FPresentationRecipe& toMatch);
 
+    UFUNCTION(BlueprintCallable, Category = Recipe)
+    int GetMaxDeductions(const FPresentationRecipe& toMatch);
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UDataTable* ChopTable;
 
@@ -114,8 +118,18 @@ public:
     TArray<TSubclassOf<AActor>> IngredientClasses;
 
 private:
-
-    bool MatchPresented(const AActor* presented, FString toMatch);
+    enum class MatchStatus {
+        Perfect,
+        WrongPhase,
+        NotChopped,
+        WrongItem
+    };
+    struct MatchRequirement {
+        FString ClassName;
+        TOptional<FString> Phase;
+    };
+    MatchRequirement ParseMatchString(const FString& String);
+    MatchStatus MatchItem(AIngredient* Presented, MatchRequirement Requirement);
 
     void InitClassTable();
 
