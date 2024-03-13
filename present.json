@@ -7,6 +7,14 @@
 		"TimeSeconds": 120
 	},
 	{
+		"Name": "EyeballToast",
+		"ResultStack": [
+			"BP_BreadSlice_C,cooked",
+			"BP_EyeballSlice_C"
+		],
+		"TimeSeconds": 60
+	},
+	{
 		"Name": "Burger",
 		"ResultStack": [
 			"BP_BreadSlice_C,cooked",
@@ -15,14 +23,6 @@
 			"BP_LettuceSlice_C",
 			"BP_BreadSlice_C,cooked"
 		],
-		"TimeSeconds": 180
-	},
-	{
-		"Name": "EyeballToast",
-		"ResultStack": [
-			"BP_BreadSlice_C,cooked",
-			"BP_EyeballSlice_C"
-		],
-		"TimeSeconds": 150
+		"TimeSeconds": 90
 	}
 ]
