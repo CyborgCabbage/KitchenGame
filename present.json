@@ -12,7 +12,7 @@
 			"BP_BreadSlice_C,cooked",
 			"BP_EyeballSlice_C"
 		],
-		"TimeSeconds": 60
+		"TimeSeconds": 120
 	},
 	{
 		"Name": "Burger",
@@ -23,6 +23,6 @@
 			"BP_LettuceSlice_C",
 			"BP_BreadSlice_C,cooked"
 		],
-		"TimeSeconds": 90
+		"TimeSeconds": 240
 	}
 ]
