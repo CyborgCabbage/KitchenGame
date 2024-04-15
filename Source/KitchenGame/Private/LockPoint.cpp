@@ -103,4 +103,3 @@ ALockPointTrigger* ULockPoint::GetTriggerActor(bool& Enabled) {
 	Enabled = (CurrentActor != nullptr);
 	return CurrentActor;
 }
-

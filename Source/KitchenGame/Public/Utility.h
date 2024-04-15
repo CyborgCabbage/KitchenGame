@@ -15,4 +15,5 @@ public:
 	~Utility();
 	
 	static void MoveToTransform(USceneComponent* ToMove, USceneComponent* Origin, USceneComponent* Destination, bool NoRotation);
+
 };

@@ -77,5 +77,4 @@ public:
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LockPoint")
 	TArray<UClass*> AllowedClasses;
-
 };
