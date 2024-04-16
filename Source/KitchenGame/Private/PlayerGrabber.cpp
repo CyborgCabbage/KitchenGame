@@ -6,10 +6,20 @@
 #include "Utility.h"
 #include "LockPoint.h"
 
-UPlayerGrabber::UPlayerGrabber() : View(nullptr), Hand(nullptr), AttachedToHand(false), GrabMax(250), GrabMin(100), GrabCurrent(0) {
+UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), GrabMax(250), GrabMin(100), GrabCurrent(0) {
+}
+
+void UPlayerGrabber::BeginPlay()
+{
+	UGrabber::BeginPlay();
+	auto ViewComponents = GetOwner()->GetComponentsByTag(USceneComponent::StaticClass(), "View");
+	View = Cast<USceneComponent>(ViewComponents[0]);
+	auto HandComponents = GetOwner()->GetComponentsByTag(USceneComponent::StaticClass(), "Hand");
+	Hand = Cast<USceneComponent>(HandComponents[0]);
 }
 
 bool UPlayerGrabber::FinishPickup() {
+	GrabCurrent = GrabMin;
 	if (Grabbed->InHand) {
 		//Hand grab
 		if (!IsValid(Hand)) {
@@ -17,7 +27,7 @@ bool UPlayerGrabber::FinishPickup() {
 			return false;
 		}
 		Grabbed->SetEnablePhysics(false, false);
-		Grabbed->GetOwner()->AttachToComponent(Hand, { EAttachmentRule::KeepWorld, true });
+		Grabbed->GetOwner()->AttachToComponent(Hand, {EAttachmentRule::KeepWorld, true});
 		Utility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
 		AttachedToHand = true;
 		return true;
@@ -75,7 +85,7 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		FVector Begin = View->GetComponentTransform().GetLocation();
 		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
 		FVector Offset = Grabbed->GrabTarget->GetComponentLocation() - Grabbed->GrabPoint->GetComponentLocation();
-		SetTarget(Begin + Direction * GrabCurrent + Offset, FRotator{ 0, View->GetComponentRotation().Yaw, 0 });
+		SetTarget(Begin + Direction * GrabCurrent + Offset, FRotator{ 0, View->GetComponentRotation().Yaw, 0});
 	}
 	//Update visual
 	if (auto* LockPointTrigger = AttachedToHand ? TraceLockPoint() : OverlapLockPoint()) {

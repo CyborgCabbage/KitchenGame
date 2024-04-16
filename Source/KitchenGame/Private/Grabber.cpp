@@ -71,6 +71,16 @@ void UGrabber::TryDrop()
 	Grabbed = nullptr;
 }
 
+UGrabbable* UGrabber::GetGrabbed()
+{
+	return Grabbed;
+}
+
+bool UGrabber::IsGrabbing()
+{
+	return IsValid(Grabbed);
+}
+
 void UGrabber::FinishDrop() {
 	if (IsValid(PhysicsHandle)) {
 		PhysicsHandle->ReleaseComponent();

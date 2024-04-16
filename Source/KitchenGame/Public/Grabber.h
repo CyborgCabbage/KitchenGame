@@ -37,4 +37,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void TryDrop();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UGrabbable* GetGrabbed();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsGrabbing();
 };

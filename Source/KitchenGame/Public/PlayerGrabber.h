@@ -18,12 +18,11 @@ public:
 	// Sets default values for this component's properties
 	UPlayerGrabber();
 protected:
+	virtual void BeginPlay() override;
 	virtual bool FinishPickup() override;
 	virtual void FinishDrop() override;
 private:
-	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> View;
-	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> Hand;
 	bool AttachedToHand;
 	UPROPERTY(EditDefaultsOnly)
