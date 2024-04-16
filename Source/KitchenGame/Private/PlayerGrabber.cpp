@@ -53,7 +53,9 @@ ALockPointTrigger* UPlayerGrabber::TraceLockPoint() {
 	FVector Begin = View->GetComponentTransform().GetLocation();
 	FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
 	TArray<FHitResult> OutHits;
-	GetWorld()->LineTraceMultiByChannel(OutHits, Begin, Begin + Direction * GrabMax, ECollisionChannel::ECC_Camera);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	GetWorld()->LineTraceMultiByChannel(OutHits, Begin, Begin + Direction * GrabMax, ECollisionChannel::ECC_Camera, QueryParams);
 	for (const FHitResult& Hit : OutHits) {
 		if (auto* LockPointTrigger = Cast<ALockPointTrigger>(Hit.GetActor())) {
 			if (LockPointTrigger->ParentLockPoint->CanLock(Grabbed)) {
