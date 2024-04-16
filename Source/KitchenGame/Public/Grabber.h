@@ -20,22 +20,17 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-private:
+	virtual bool FinishPickup();
+	virtual void FinishDrop();
 	TObjectPtr<UGrabbable> Grabbed;
-	TObjectPtr<USceneComponent> Hand;
-	TOptional<FTransform> TargetLocation;
-	bool AttachedToHand;
+private:
 	TObjectPtr<UPhysicsHandleComponent> PhysicsHandle;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetHand(USceneComponent* SceneComponent);
-
-	UFUNCTION(BlueprintCallable)
-	void SetTargetTransform(FTransform Transform);
+	void SetTarget(FVector Location, FRotator Rotation);
 
 	UFUNCTION(BlueprintCallable)
 	void TryPickup(UGrabbable* Grabbable);

@@ -15,7 +15,6 @@ ALockPointTrigger::ALockPointTrigger() : VisibilityTimer(0.0f)
 void ALockPointTrigger::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
