@@ -4,16 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-
+#include "Utility.generated.h"
 /**
  * 
  */
-class KITCHENGAME_API Utility
+UCLASS()
+class KITCHENGAME_API UUtility : public UBlueprintFunctionLibrary
 {
+	GENERATED_BODY()
 public:
-	Utility();
-	~Utility();
-	
+	UUtility();
+	~UUtility();
+
+	UFUNCTION(BlueprintCallable)
 	static void MoveToTransform(USceneComponent* ToMove, USceneComponent* Origin, USceneComponent* Destination, bool NoRotation);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FVector2D ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition);
 };

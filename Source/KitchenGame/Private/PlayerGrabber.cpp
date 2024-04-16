@@ -28,7 +28,7 @@ bool UPlayerGrabber::FinishPickup() {
 		}
 		Grabbed->SetEnablePhysics(false, false);
 		Grabbed->GetOwner()->AttachToComponent(Hand, {EAttachmentRule::KeepWorld, true});
-		Utility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
+		UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
 		AttachedToHand = true;
 		return true;
 	}

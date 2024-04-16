@@ -70,7 +70,7 @@ void ULockPoint::SetEnabled(bool Enabled) {
 }
 
 void ULockPoint::LockItem(UGrabbable* Grabbed) {
-	Utility::MoveToTransform(Grabbed->GrabTarget, Grabbed->BottomPoint, this, false);
+	UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->BottomPoint, this, false);
 	Grabbed->SetEnablePhysics(false, true);
 	InUse = true;
 	LockedItem = Grabbed;
