@@ -21,6 +21,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
@@ -45,6 +46,7 @@ public:
 	/** Please add a function description */
 	UFUNCTION(BlueprintPure)
 	ALockPointTrigger* GetTriggerActor(bool& Enabled);
+
 public:
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LockPoint")

@@ -24,11 +24,6 @@ void UGrabbable::BeginPlay()
 	
 }
 
-void UGrabbable::EndPlay(const EEndPlayReason::Type EndPlayReason) {
-	UnlockIfLocked();
-}
-
-
 // Called every frame
 void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -56,7 +51,6 @@ void UGrabbable::SetEnablePhysics(bool Simulating, bool Colliding) {
 
 void UGrabbable::UnlockIfLocked() {
 	if(!IsLocked) return;
-	IsLocked = false;
 	if(!IsValid(LockPoint)) return;
 	LockPoint->UnlockItem();
 }
