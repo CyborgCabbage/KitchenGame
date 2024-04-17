@@ -43,4 +43,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsGrabbing();
+
+	void OnGrabbedDestroyed(AActor* DestroyedActor);
 };
