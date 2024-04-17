@@ -29,14 +29,29 @@ void ULockPoint::BeginPlay()
 	
 }
 
+void ULockPoint::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (EndPlayReason == EEndPlayReason::Destroyed) {
+		if (IsValid(LockedItem)) {
+			LockedItem->SetEnablePhysics(true, true);
+			LockedItem->LockPoint = nullptr;
+			LockedItem->IsLocked = false;
+			LockedItem = nullptr;
+		}
+	}
+}
+
 
 // Called every frame
 void ULockPoint::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	if(AlwaysEnabled) return;
-	if(InUse) return;
+	if (InUse) {
+		InUse = IsValid(LockedItem);
+		return;
+	}
 	if(auto* grabbable = GetOwner()->GetComponentByClass<UGrabbable>()) {
 		if(grabbable->IsLocked) {
 			auto lp = grabbable->LockPoint;
@@ -83,9 +98,12 @@ void ULockPoint::LockItem(UGrabbable* Grabbed) {
 void ULockPoint::UnlockItem() {
 	if(!InUse) return;
 	InUse = false;
-	if(!IsValid(LockedItem)) return;
-	LockedItem->IsLocked = false;
-	LockedItem->SetEnablePhysics(true, true);
+	if (IsValid(LockedItem)) {
+		LockedItem->SetEnablePhysics(true, true);
+		LockedItem->LockPoint = nullptr;
+		LockedItem->IsLocked = false;
+		LockedItem = nullptr;
+	}
 	SetEnabled(true);
 }
 
