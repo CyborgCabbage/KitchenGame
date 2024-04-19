@@ -20,5 +20,5 @@ public:
 	static void MoveToTransform(USceneComponent* ToMove, USceneComponent* Origin, USceneComponent* Destination, bool NoRotation);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static FVector2D ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition);
+	static FVector2D ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition, float& ArrowAngle);
 };

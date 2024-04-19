@@ -54,6 +54,7 @@ void ATutorialManager::Tick(float DeltaTime)
 	//
 	if (!IsActive) {
 		SetInstruction({});
+		OnHighlightChange(Highlighted);
 		return;
 	}
 	//Select current step

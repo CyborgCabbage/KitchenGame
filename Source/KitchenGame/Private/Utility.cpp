@@ -33,32 +33,45 @@ void UUtility::MoveToTransform(USceneComponent* ToMove, USceneComponent* Origin,
 	ToMove->SetWorldTransform(toMove, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
-FVector2D UUtility::ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition)
+FVector2D UUtility::ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition, float& ArrowAngle)
 {
+	ArrowAngle = 0;
 	ULocalPlayer* const LP = Player->GetLocalPlayer();
 	if (LP && LP->ViewportClient)
 	{
-		// get the projection data
+		//Viewport Size
+		FVector2D ViewportSize;
+		LP->ViewportClient->GetViewportSize(ViewportSize);
+		FVector2D ViewportCentre = ViewportSize / 2;
+		float Radius = ViewportCentre.GetMin() * 0.8f;
+		FVector2D ScreenPosition = FVector2D::ZeroVector;
+		//Get the projection data
 		FSceneViewProjectionData ProjectionData;
 		if (LP->GetProjectionData(LP->ViewportClient->Viewport, /*out*/ ProjectionData))
 		{
 			FMatrix const ViewProjectionMatrix = ProjectionData.ComputeViewProjectionMatrix();
-			FVector2D ScreenPosition;
-			bool bResult = FSceneView::ProjectWorldToScreen(WorldPosition, ProjectionData.GetConstrainedViewRect(), ViewProjectionMatrix, ScreenPosition);
+			FSceneView::ProjectWorldToScreen(WorldPosition, ProjectionData.GetConstrainedViewRect(), ViewProjectionMatrix, ScreenPosition);
 			//Relative Viewport
 			ScreenPosition -= FVector2D(ProjectionData.GetConstrainedViewRect().Min);
-			bResult = bResult && Player->PostProcessWorldToScreen(WorldPosition, ScreenPosition, true);
-			//Adjust to viewport scale
-			FVector2D ViewportSize;
-			LP->ViewportClient->GetViewportSize(ViewportSize);
-			float UserResolutionScale = GetDefault<UUserInterfaceSettings>()->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
-			ScreenPosition /= UserResolutionScale;
-			//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, ScreenPosition.ToString());
-			ScreenPosition.X = FMath::Clamp(ScreenPosition.X, 0, ViewportSize.X / UserResolutionScale);
-			ScreenPosition.Y = FMath::Clamp(ScreenPosition.Y, 0, ViewportSize.Y / UserResolutionScale);
-			return ScreenPosition;
+			//Custom Post Process
+			Player->PostProcessWorldToScreen(WorldPosition, ScreenPosition, true);
+			//Out of Circle
+			if (FVector2D::Distance(ViewportCentre, ScreenPosition) > Radius) {
+				FMatrix ViewTransform = FTranslationMatrix(-ProjectionData.ViewOrigin) * ProjectionData.ViewRotationMatrix;
+				//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Result.ToString());
+				ScreenPosition = FVector2D(ViewTransform.TransformFVector4(FVector4(WorldPosition, 1.f)));
+				ScreenPosition.Y *= -1;
+				ScreenPosition.Normalize();
+				ArrowAngle = FMath::RadiansToDegrees(FMath::Atan2(ScreenPosition.Y, ScreenPosition.X)) - 90.0f;
+				ScreenPosition = ScreenPosition * Radius + ViewportCentre;
+			}
 		}
+		//Adjust to viewport scale
+		float UserResolutionScale = GetDefault<UUserInterfaceSettings>()->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
+		ScreenPosition /= UserResolutionScale;
+		return ScreenPosition;
 	}
+	
 	return FVector2D::ZeroVector;
 }
 
