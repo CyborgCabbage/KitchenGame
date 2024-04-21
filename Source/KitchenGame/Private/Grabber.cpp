@@ -56,8 +56,8 @@ bool UGrabber::FinishPickup() {
 	PhysicsHandle->GrabComponentAtLocationWithRotation(
 		Grabbed->GrabTarget,
 		NAME_None,
-		Grabbed->GrabTarget->GetComponentLocation(),
-		Grabbed->GrabTarget->GetComponentRotation()
+		Grabbed->GrabTarget->GetSocketLocation("Grab"),
+		Grabbed->GrabTarget->GetSocketRotation("Grab")
 	);
 	return true;
 }

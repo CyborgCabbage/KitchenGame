@@ -28,7 +28,14 @@ bool UPlayerGrabber::FinishPickup() {
 		}
 		Grabbed->SetEnablePhysics(false, false);
 		Grabbed->GetOwner()->AttachToComponent(Hand, {EAttachmentRule::KeepWorld, true});
-		UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
+		Grabbed->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
+		Grabbed->GetOwner()->SetActorRelativeRotation(FQuat::Identity);
+		FTransform SocketTransform = Grabbed->GrabTarget->GetSocketTransform("Grab").GetRelativeTransform(Hand->GetComponentTransform());
+		SocketTransform.SetScale3D(FVector::OneVector);
+		SocketTransform = SocketTransform.Inverse();
+		Grabbed->GetOwner()->SetActorRelativeLocation(SocketTransform.GetLocation());
+		Grabbed->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());
+		//UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
 		AttachedToHand = true;
 		return true;
 	}
@@ -40,7 +47,7 @@ bool UPlayerGrabber::FinishPickup() {
 void UPlayerGrabber::FinishDrop() {
 	if (AttachedToHand) {
 		Grabbed->SetEnablePhysics(true, true);
-		Grabbed->GetOwner()->DetachFromActor(FDetachmentTransformRules{ EDetachmentRule::KeepWorld, true });
+		Grabbed->GetOwner()->DetachFromActor({ EDetachmentRule::KeepWorld, true });
 		AttachedToHand = false;
 	}
 	else {
@@ -86,8 +93,8 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	if (IsValid(Grabbed) && !AttachedToHand) {
 		FVector Begin = View->GetComponentTransform().GetLocation();
 		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
-		FVector Offset = Grabbed->GrabTarget->GetComponentLocation() - Grabbed->GrabPoint->GetComponentLocation();
-		SetTarget(Begin + Direction * GrabCurrent + Offset, FRotator{ 0, View->GetComponentRotation().Yaw, 0});
+		//FVector Offset = Grabbed->GrabTarget->GetComponentLocation() - Grabbed->GrabPoint->GetComponentLocation();
+		SetTarget(Begin + Direction * GrabCurrent/* + Offset*/, FRotator{0, View->GetComponentRotation().Yaw, 0});
 	}
 	//Update visual
 	if (auto* LockPointTrigger = AttachedToHand ? TraceLockPoint() : OverlapLockPoint()) {
