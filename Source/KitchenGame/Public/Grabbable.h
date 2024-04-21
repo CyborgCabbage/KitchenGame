@@ -27,7 +27,7 @@ public:
 
 	/** Please add a function description */
 	UFUNCTION(BlueprintCallable)
-	void ConfigureGrabbable(UPrimitiveComponent* Physics, bool InHand, USceneComponent* BottomPoint, USceneComponent* GrabPoint);
+	void ConfigureGrabbable(UPrimitiveComponent* Physics, bool InHand);
 
 	/** Please add a function description */
 	UFUNCTION(BlueprintCallable)
@@ -52,14 +52,6 @@ public:
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	bool InHand;
-
-	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-	TObjectPtr<USceneComponent> BottomPoint;
-
-	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
-	TObjectPtr<USceneComponent> GrabPoint;
 
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")

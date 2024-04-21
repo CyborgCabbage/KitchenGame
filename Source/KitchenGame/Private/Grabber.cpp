@@ -53,13 +53,17 @@ bool UGrabber::FinishPickup() {
 		return false;
 	}
 	Grabbed->SetEnablePhysics(true, true);
+	FName BoneName = NAME_None;
+	if(auto* SkelMesh = Cast<USkeletalMeshComponent>(Grabbed->GrabTarget)) {
+		BoneName = SkelMesh->GetSocketBoneName("Grab");
+	}
 	PhysicsHandle->GrabComponentAtLocationWithRotation(
 		Grabbed->GrabTarget,
-		NAME_None,
+		BoneName,
 		Grabbed->GrabTarget->GetSocketLocation("Grab"),
 		Grabbed->GrabTarget->GetSocketRotation("Grab")
 	);
-	return true;
+	return IsValid(PhysicsHandle->GetGrabbedComponent());
 }
 
 void UGrabber::TryDrop()

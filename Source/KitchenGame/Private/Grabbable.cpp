@@ -32,10 +32,8 @@ void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	// ...
 }
 
-void UGrabbable::ConfigureGrabbable(UPrimitiveComponent* Physics, bool InHandValue, USceneComponent* BottomPointValue, USceneComponent* GrabPointValue) {
+void UGrabbable::ConfigureGrabbable(UPrimitiveComponent* Physics, bool InHandValue) {
 	InHand = InHandValue;
-	BottomPoint = BottomPointValue;
-	GrabPoint = GrabPointValue;
 	GrabTarget = Physics;
 	Physics->SetSimulatePhysics(true);
 	for(UPrimitiveComponent* pc : TInlineComponentArray<UPrimitiveComponent*>{ Physics->GetOwner() }) {

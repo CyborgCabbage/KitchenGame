@@ -5,6 +5,7 @@
 #include "Grabbable.h"
 #include "Utility.h"
 #include "LockPoint.h"
+#include "Engine/SkeletalMesh.h"
 
 UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), GrabMax(250), GrabMin(100), GrabCurrent(0) {
 }
@@ -93,8 +94,7 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	if (IsValid(Grabbed) && !AttachedToHand) {
 		FVector Begin = View->GetComponentTransform().GetLocation();
 		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
-		//FVector Offset = Grabbed->GrabTarget->GetComponentLocation() - Grabbed->GrabPoint->GetComponentLocation();
-		SetTarget(Begin + Direction * GrabCurrent/* + Offset*/, FRotator{0, View->GetComponentRotation().Yaw, 0});
+		SetTarget(Begin + Direction * GrabCurrent, FRotator{0, View->GetComponentRotation().Yaw, 0});
 	}
 	//Update visual
 	if (auto* LockPointTrigger = AttachedToHand ? TraceLockPoint() : OverlapLockPoint()) {
