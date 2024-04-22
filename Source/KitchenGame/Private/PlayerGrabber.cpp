@@ -50,6 +50,18 @@ void UPlayerGrabber::FinishDrop() {
 		Grabbed->SetEnablePhysics(true, true);
 		Grabbed->GetOwner()->DetachFromActor({ EDetachmentRule::KeepWorld, true });
 		AttachedToHand = false;
+		FVector Begin = View->GetComponentTransform().GetLocation();
+		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
+		TArray<FHitResult> OutHits;
+		FQuat ViewRotation = FQuat::MakeFromEuler(View->GetComponentRotation().Euler() * FVector{0, 0, 1});
+		FComponentQueryParams QueryParams;
+		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * (GrabMax + 50), ViewRotation, ECollisionChannel::ECC_Camera, QueryParams);
+		float Distance = GrabMin;
+		for(const FHitResult Hit : OutHits) {
+			if(!Hit.bBlockingHit) continue;
+			Distance = Hit.Distance;
+		}
+		Grabbed->GrabTarget->SetWorldLocationAndRotation(Begin + Direction * Distance, ViewRotation);
 	}
 	else {
 		UGrabber::FinishDrop();
