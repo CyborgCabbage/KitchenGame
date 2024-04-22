@@ -67,7 +67,7 @@ public:
 
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "Default")
-	TObjectPtr<AActor> Grabber;
+	TObjectPtr<UGrabber> Grabber;
 
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")

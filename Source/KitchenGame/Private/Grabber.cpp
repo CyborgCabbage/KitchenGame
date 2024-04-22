@@ -37,7 +37,7 @@ void UGrabber::TryPickup(UGrabbable* grabbable)
 	if (IsValid(Grabbed)) return;
 	Grabbed = grabbable;
 	Grabbed->IsGrabbed = true;
-	Grabbed->Grabber = this->GetOwner();//TODO
+	Grabbed->Grabber = this;
 	Grabbed->UnlockIfLocked();
 	if(!FinishPickup()) {
 		Grabbed->IsGrabbed = false;
