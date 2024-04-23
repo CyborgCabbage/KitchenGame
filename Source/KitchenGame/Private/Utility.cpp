@@ -75,4 +75,14 @@ FVector2D UUtility::ProjectWorldToScreen(APlayerController const* Player, FVecto
 	return FVector2D::ZeroVector;
 }
 
+FString UUtility::WithCapital(const FString& SInput)
+{
+	FString SOutput = SInput;
+	if (SOutput.Len() > 0) {
+		auto& Character = SOutput.GetCharArray()[0];
+		Character = toupper(Character);
+	}
+	return SOutput;
+}
+
 

@@ -21,4 +21,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FVector2D ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition, float& ArrowAngle);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FString WithCapital(const FString& SInput);
 };
