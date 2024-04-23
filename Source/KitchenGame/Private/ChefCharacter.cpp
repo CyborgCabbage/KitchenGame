@@ -27,42 +27,24 @@ bool AChefCharacter::CanAttack(const USceneComponent* KickOrigin, FString& Strin
 	Branches = EAttackType::Then;
 	if (AttackCooldownTimer > 0) return false;
 	auto* Camera = GetComponentByClass<UCameraComponent>();
-	//Punch
-	ForceDirection = Camera->GetForwardVector();
-	auto PunchHitActors = TraceAttack(Camera->GetComponentLocation(), Camera->GetComponentLocation() + Camera->GetForwardVector() * PunchRange);
-	//Kick
-	ForceDirection = KickOrigin->GetForwardVector() + FVector{ 0.0f, 0.0f, 0.2f };
-	ForceDirection.Normalize();
-	auto KickHitActors = TraceAttack(KickOrigin->GetComponentLocation(), KickOrigin->GetComponentLocation() + KickOrigin->GetForwardVector() * KickRange);
-	if (PunchHitActors.IsEmpty() != KickHitActors.IsEmpty()) {
-		if (!PunchHitActors.IsEmpty()) {
-			HitActors = PunchHitActors;
-			Branches = EAttackType::Punch;
-			String = "Punch";
-			return true;
-		}
-		else {
-			HitActors = KickHitActors;
-			Branches = EAttackType::Kick;
-			String = "Kick";
-			return true;
-		}
+	if (Camera->GetRelativeRotation().Pitch > -25) {
+		//Punch
+		ForceDirection = Camera->GetForwardVector();
+		Branches = EAttackType::Punch;
+		HitActors = TraceAttack(Camera->GetComponentLocation(), Camera->GetComponentLocation() + Camera->GetForwardVector() * PunchRange);
+		if (HitActors.IsEmpty()) return false;
+		String = "Punch";
+		return true;
 	}
 	else {
-		if (Camera->GetRelativeRotation().Pitch > -25) {
-			HitActors = PunchHitActors;
-			Branches = EAttackType::Punch;
-			if (HitActors.IsEmpty()) return false;
-			String = "Punch";
-			return true;
-		}
-		else {
-			HitActors = KickHitActors;
-			Branches = EAttackType::Kick;
-			if (HitActors.IsEmpty()) return false;
-			String = "Kick";
-			return true;
-		}
+		//Kick
+		ForceDirection = KickOrigin->GetForwardVector() + FVector{ 0.0f, 0.0f, 0.2f };
+		ForceDirection.Normalize();
+		Branches = EAttackType::Kick;
+		HitActors = TraceAttack(KickOrigin->GetComponentLocation(), KickOrigin->GetComponentLocation() + KickOrigin->GetForwardVector() * KickRange);
+		if (HitActors.IsEmpty()) return false;
+		String = "Kick";
+		return true;
 	}
 	return false;
 }
