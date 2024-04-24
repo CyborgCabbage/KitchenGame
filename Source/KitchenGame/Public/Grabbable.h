@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCanGrab(bool Value, bool Recursive);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsOnClass(TSubclassOf<AActor> Class, bool Recursive);
+
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	TObjectPtr<UPrimitiveComponent> GrabTarget;

@@ -83,3 +83,16 @@ void UGrabbable::SetCanGrab(bool Value, bool Recursive) {
 	}
 }
 
+bool UGrabbable::IsOnClass(TSubclassOf<AActor> Class, bool Recursive)
+{
+	auto* Parent = GetOwner()->GetAttachParentActor();
+	if (!Parent) return false;
+	if (Parent->IsA(Class)) return true;
+	if (Recursive) {
+		if (auto* Grabbable = Parent->GetComponentByClass<UGrabbable>()) {
+			Grabbable->IsOnClass(Class, true);
+		}
+	}
+	return false;
+}
+
