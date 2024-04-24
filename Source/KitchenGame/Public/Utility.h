@@ -19,6 +19,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static void MoveToTransform(USceneComponent* ToMove, USceneComponent* Origin, USceneComponent* Destination, bool NoRotation);
 
+	UFUNCTION(BlueprintCallable)
+	static FTransform MoveToTransform2(USceneComponent* ToMove, FTransform Origin, FTransform Destination, bool NoRotation);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FVector2D ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition, float& ArrowAngle);
 

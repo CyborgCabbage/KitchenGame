@@ -50,18 +50,25 @@ void UPlayerGrabber::FinishDrop() {
 		Grabbed->SetEnablePhysics(true, true);
 		Grabbed->GetOwner()->DetachFromActor({ EDetachmentRule::KeepWorld, true });
 		AttachedToHand = false;
-		FVector Begin = View->GetComponentTransform().GetLocation();
-		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
+		FTransform OriginTransform = UUtility::MoveToTransform2(
+			Grabbed->GrabTarget, 
+			Grabbed->GrabTarget->GetSocketTransform("Bottom", RTS_World),
+			View->GetComponentTransform(),
+			true
+		);
+		FVector Begin = OriginTransform.GetLocation();
+		FVector Direction = View->GetForwardVector();
 		TArray<FHitResult> OutHits;
-		FQuat ViewRotation = FQuat::MakeFromEuler(View->GetComponentRotation().Euler() * FVector{0, 0, 1});
 		FComponentQueryParams QueryParams;
-		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * (GrabMax + 50), ViewRotation, ECollisionChannel::ECC_Camera, QueryParams);
-		float Distance = GrabMin;
-		for(const FHitResult Hit : OutHits) {
-			if(!Hit.bBlockingHit) continue;
-			Distance = Hit.Distance;
+		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * (GrabMax + 50), OriginTransform.GetRotation(), ECollisionChannel::ECC_Camera, QueryParams);
+		FVector Location = Begin + Direction * GrabMin;
+		for (const FHitResult Hit : OutHits) {
+			if (!Hit.bBlockingHit) continue;
+			Location = Hit.Location;
+			break;
 		}
-		Grabbed->GrabTarget->SetWorldLocationAndRotation(Begin + Direction * Distance, ViewRotation);
+		Grabbed->GrabTarget->SetWorldLocationAndRotation(Location, OriginTransform.GetRotation());
+		Grabbed->GrabTarget->AddImpulse(GetOwner()->GetVelocity(), NAME_None, true);
 	}
 	else {
 		UGrabber::FinishDrop();

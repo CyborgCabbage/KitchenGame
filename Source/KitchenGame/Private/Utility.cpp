@@ -33,6 +33,22 @@ void UUtility::MoveToTransform(USceneComponent* ToMove, USceneComponent* Origin,
 	ToMove->SetWorldTransform(toMove, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
+FTransform UUtility::MoveToTransform2(USceneComponent* ToMove, FTransform Origin, FTransform Destination, bool NoRotation) {
+	//Get Transforms and normalize scale
+	FTransform toMoveTransform = ToMove->GetComponentTransform();
+	toMoveTransform.SetScale3D({ 1,1,1 });
+	Origin.SetScale3D({ 1,1,1 });
+	Destination.SetScale3D({ 1,1,1 });
+	if (NoRotation) {
+		FQuat rotation = Destination.GetRotation();
+		rotation = FQuat::MakeFromEuler({ 0, 0, rotation.Euler().Z });
+		Destination.SetRotation(rotation);
+	}
+	FTransform temp = UKismetMathLibrary::ComposeTransforms(Origin, toMoveTransform.Inverse());
+	FTransform toMove = UKismetMathLibrary::ComposeTransforms(temp.Inverse(), Destination);
+	toMove.SetScale3D(ToMove->GetComponentScale());
+	return toMove;
+}
 FVector2D UUtility::ProjectWorldToScreen(APlayerController const* Player, FVector WorldPosition, float& ArrowAngle)
 {
 	ArrowAngle = 0;
