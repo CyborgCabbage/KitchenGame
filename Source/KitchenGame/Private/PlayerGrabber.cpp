@@ -97,13 +97,22 @@ ALockPointTrigger* UPlayerGrabber::OverlapLockPoint() {
 	if (!IsValid(Grabbed)) return nullptr;
 	TArray<AActor*> Overlapping;
 	Grabbed->GrabTarget->GetOverlappingActors(Overlapping, ALockPointTrigger::StaticClass());
+	float MinDistance = INFINITY;
+	ALockPointTrigger* MinLockPointTrigger = nullptr;
 	for (AActor* Actor : Overlapping) {
 		auto* LockPointTrigger = Cast<ALockPointTrigger>(Actor);
 		if (LockPointTrigger->ParentLockPoint->CanLock(Grabbed)) {
-			return LockPointTrigger;
+			FVector LockPointLocation = LockPointTrigger->GetActorLocation();
+			FVector LockPointUp = LockPointTrigger->GetActorUpVector();
+			FVector Point = Grabbed->GrabTarget->GetComponentLocation();
+			float T = -((LockPointLocation - Point) | LockPointUp);
+			if (T < MinDistance) {
+				MinDistance = T;
+				MinLockPointTrigger = LockPointTrigger;
+			}
 		}
 	}
-	return nullptr;
+	return MinLockPointTrigger;
 }
 
 void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
