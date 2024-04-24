@@ -109,6 +109,8 @@ bool ATutorialManager::IsGrabbingClass(TSubclassOf<AActor> ActorClass)
 TArray<AActor*> ATutorialManager::GetGrabbingClass(TSubclassOf<AActor> ActorClass)
 {
 	auto* Grabber = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetComponentByClass<UGrabber>();
+
+	if (!UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetComponentByClass<UGrabber>()) return {};
 	if (!Grabber->IsGrabbing()) return {};
 	if (!Grabber->GetGrabbed()->GetOwner()->IsA(ActorClass)) return {};
 	return { Grabber->GetGrabbed()->GetOwner() };
