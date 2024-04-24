@@ -43,7 +43,7 @@ public:
 
 	/** Please add a function description */
 	UFUNCTION(BlueprintCallable)
-	void SetCanGrab(bool Value);
+	void SetCanGrab(bool Value, bool Recursive);
 
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")

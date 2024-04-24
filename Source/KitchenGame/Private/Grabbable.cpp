@@ -71,7 +71,15 @@ void UGrabbable::SetEnableCollision(bool Value, bool Recursive) {
 	}
 }
 
-void UGrabbable::SetCanGrab(bool Value) {
+void UGrabbable::SetCanGrab(bool Value, bool Recursive) {
 	CanGrab = Value;
+	if (Recursive) {
+		GetOwner()->ForEachAttachedActors([&](AActor* attached) -> bool {
+			if (auto* grabbable = attached->GetComponentByClass<UGrabbable>()) {
+				grabbable->SetCanGrab(Value, true);
+			}
+			return true;
+		});
+	}
 }
 
