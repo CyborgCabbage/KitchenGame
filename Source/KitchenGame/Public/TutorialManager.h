@@ -99,6 +99,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* GetNearestActor(TArray<AActor*> Actors);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FText GetCurrentInstruction();
+
 	// Create Event
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnInstructionChange(const FText& NewInstruction);

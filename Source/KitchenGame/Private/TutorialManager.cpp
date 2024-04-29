@@ -187,6 +187,11 @@ AActor* ATutorialManager::GetNearestActor(TArray<AActor*> Actors)
 	return MinActor;
 }
 
+FText ATutorialManager::GetCurrentInstruction()
+{
+	return CurrentInstruction;
+}
+
 UTutorialStep* UTutorialStep::TutorialStep(ATutorialManager* TutorialManager, FText Instruction, bool Essential, bool Remember)
 {
 	UTutorialStep* Node = NewObject<UTutorialStep>();
