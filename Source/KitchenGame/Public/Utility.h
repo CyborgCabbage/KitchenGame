@@ -29,5 +29,5 @@ public:
 	static FString WithCapital(const FString& SInput);
 
 	UFUNCTION(BlueprintCallable)
-	static void giant(AActor* Actor);
+	static void DestroyActorAndAttached(AActor* Actor);
 };
