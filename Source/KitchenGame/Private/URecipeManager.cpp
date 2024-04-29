@@ -221,7 +221,14 @@ TArray<FScoreDeduction> URecipeManager::TryPresent(const TArray<AActor*>& presen
 			if (Info.Key.Status == MatchStatus::NotChopped) Deductions.Add({ DeductNotChopped, FString::Printf(TEXT("'%s' should have been chopped"), *Info.Key.Ref->IngredientID) });
 		}
 		else {
-			Deductions.Add({ DeductMissingItem, FString::Printf(TEXT("'%s' was missing"), *Info.Value.ClassName) });
+			FString IngredientName = Info.Value.ClassName;
+			InitClassTable();
+			if (auto* IngredientClass = NameToClass.Find(Info.Value.ClassName)) {
+				if (AIngredient* CDO = Cast<AIngredient>(IngredientClass->GetDefaultObject())) {
+					IngredientName = CDO->IngredientID;
+				}
+			}
+			Deductions.Add({ DeductMissingItem, FString::Printf(TEXT("'%s' was missing"), *IngredientName) });
 		}
 	}
 	if (IncorrectOrder) {
