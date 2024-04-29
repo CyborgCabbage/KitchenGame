@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FString WithCapital(const FString& SInput);
+
+	UFUNCTION(BlueprintCallable)
+	static void DestroyActorAndAttached(AActor* Actor);
 };

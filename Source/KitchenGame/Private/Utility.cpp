@@ -101,4 +101,14 @@ FString UUtility::WithCapital(const FString& SInput)
 	return SOutput;
 }
 
+void UUtility::DestroyActorAndAttached(AActor* Actor)
+{
+	TArray<AActor*> OutActors;
+	Actor->GetAttachedActors(OutActors, true, true);
+	Actor->Destroy();
+	for (AActor* OutActor : OutActors) {
+		OutActor->Destroy();
+	}
+}
+
 
