@@ -7,7 +7,7 @@
 #include "LockPoint.h"
 #include "Engine/SkeletalMesh.h"
 
-UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), GrabMax(250), GrabMin(100), GrabCurrent(0) {
+UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), DropDistance(100), GrabDistance(120), TraceDistance(150), TraceRadius(5) {
 }
 
 void UPlayerGrabber::BeginPlay()
@@ -20,7 +20,6 @@ void UPlayerGrabber::BeginPlay()
 }
 
 bool UPlayerGrabber::FinishPickup() {
-	GrabCurrent = GrabMin;
 	if (Grabbed->InHand) {
 		//Hand grab
 		if (!IsValid(Hand)) {
@@ -60,8 +59,13 @@ void UPlayerGrabber::FinishDrop() {
 		FVector Direction = View->GetForwardVector();
 		TArray<FHitResult> OutHits;
 		FComponentQueryParams QueryParams;
-		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * (GrabMax + 50), OriginTransform.GetRotation(), ECollisionChannel::ECC_Camera, QueryParams);
-		FVector Location = Begin + Direction * GrabMin;
+		QueryParams.AddIgnoredActor(GetOwner());
+		QueryParams.AddIgnoredActor(Grabbed->GetOwner());
+		TArray<AActor*> Attached;
+		Grabbed->GetOwner()->GetAttachedActors(Attached, true, true);
+		QueryParams.AddIgnoredActors(Attached);
+		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * TraceDistance, OriginTransform.GetRotation(), ECollisionChannel::ECC_Camera, QueryParams);
+		FVector Location = Begin + Direction * TraceDistance;
 		for (const FHitResult Hit : OutHits) {
 			if (!Hit.bBlockingHit) continue;
 			Location = Hit.Location;
@@ -81,8 +85,13 @@ ALockPointTrigger* UPlayerGrabber::TraceLockPoint() {
 	FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
 	TArray<FHitResult> OutHits;
 	FCollisionQueryParams QueryParams;
+	//Ignore player and grabbed
 	QueryParams.AddIgnoredActor(GetOwner());
-	GetWorld()->LineTraceMultiByChannel(OutHits, Begin, Begin + Direction * GrabMax, ECollisionChannel::ECC_Camera, QueryParams);
+	QueryParams.AddIgnoredActor(Grabbed->GetOwner());
+	TArray<AActor*> Attached;
+	Grabbed->GetOwner()->GetAttachedActors(Attached, true, true);
+	QueryParams.AddIgnoredActors(Attached);
+	GetWorld()->SweepMultiByChannel(OutHits, Begin, Begin + Direction * TraceDistance, FQuat::Identity, ECollisionChannel::ECC_Camera, FCollisionShape::MakeSphere(TraceRadius), QueryParams);
 	for (const FHitResult& Hit : OutHits) {
 		if (auto* LockPointTrigger = Cast<ALockPointTrigger>(Hit.GetActor())) {
 			if (LockPointTrigger->ParentLockPoint->CanLock(Grabbed)) {
@@ -116,6 +125,19 @@ ALockPointTrigger* UPlayerGrabber::OverlapLockPoint() {
 	return MinLockPointTrigger;
 }
 
+ALockPointTrigger* UPlayerGrabber::GetTargetLockPoint() {
+	ALockPointTrigger* LockPointTrigger = nullptr;
+	if (AttachedToHand) {
+		LockPointTrigger = TraceLockPoint();
+	} else {
+		LockPointTrigger = OverlapLockPoint();
+		if(!LockPointTrigger) {
+			LockPointTrigger = TraceLockPoint();
+		}
+	}
+	return LockPointTrigger;
+}
+
 void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	UGrabber::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -123,10 +145,10 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	if (IsValid(Grabbed) && !AttachedToHand) {
 		FVector Begin = View->GetComponentTransform().GetLocation();
 		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
-		SetTarget(Begin + Direction * GrabCurrent, FRotator{0, View->GetComponentRotation().Yaw, 0});
+		SetTarget(Begin + Direction * GrabDistance, FRotator{0, View->GetComponentRotation().Yaw, 0});
 	}
 	//Update visual
-	if (auto* LockPointTrigger = AttachedToHand ? TraceLockPoint() : OverlapLockPoint()) {
+	if(auto* LockPointTrigger = GetTargetLockPoint()) {
 		LockPointTrigger->SetEnableVisual();
 	}
 }
@@ -134,15 +156,10 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 void UPlayerGrabber::TryDropToLockPoint()
 {
 	if (!IsValid(Grabbed)) return;
-	ALockPointTrigger* LockPointTrigger = AttachedToHand ? TraceLockPoint() : OverlapLockPoint();
+	ALockPointTrigger* LockPointTrigger = GetTargetLockPoint();
 	UGrabbable* Grabbable = Grabbed;
 	TryDrop();
 	if (LockPointTrigger) {
 		LockPointTrigger->ParentLockPoint->LockItem(Grabbable);
 	}
-}
-
-void UPlayerGrabber::AdjustGrabDistance(float Change)
-{
-	GrabCurrent = FMath::Clamp(GrabCurrent + Change, GrabMin, GrabMax);
 }

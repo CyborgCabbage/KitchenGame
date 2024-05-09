@@ -26,20 +26,21 @@ private:
 	TObjectPtr<USceneComponent> Hand;
 	bool AttachedToHand;
 	UPROPERTY(EditDefaultsOnly)
-	float GrabMax;
+	float DropDistance;
 	UPROPERTY(EditDefaultsOnly)
-	float GrabMin;
+	float GrabDistance;
 	UPROPERTY(EditDefaultsOnly)
-	float GrabCurrent;
+	float TraceDistance;
+	UPROPERTY(EditDefaultsOnly)
+	float TraceRadius;
 	ALockPointTrigger* TraceLockPoint();
 	ALockPointTrigger* OverlapLockPoint();
+
+	ALockPointTrigger* GetTargetLockPoint();
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
 	void TryDropToLockPoint();
-
-	UFUNCTION(BlueprintCallable)
-	void AdjustGrabDistance(float Change);
 };
