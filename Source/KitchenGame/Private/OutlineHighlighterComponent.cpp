@@ -48,12 +48,12 @@ void UOutlineHighlighterComponent::SetHighlighted(AActor* NewTarget) {
 			ToRemove.Add(Actor);
 		}
 	}
-	TArray<AActor*> ToAdd;
+	/*TArray<AActor*> ToAdd;
 	for (AActor* Actor : NewTargets) {
 		if (!Targets.Contains(Actor)) {
 			ToAdd.Add(Actor);
 		}
-	}
+	}*/
 	//Clear bit on old outline
 	for(AActor* Actor : ToRemove) {
 		TArray<UPrimitiveComponent*> Primitives;
@@ -65,7 +65,7 @@ void UOutlineHighlighterComponent::SetHighlighted(AActor* NewTarget) {
 		}
 	}
 	//Set bit for new outline
-	for (AActor* Actor : ToAdd) {
+	for (AActor* Actor : /*ToAdd*/NewTargets) {
 		TArray<UPrimitiveComponent*> Primitives;
 		Actor->GetComponents(Primitives);
 		for (UPrimitiveComponent* Primitive : Primitives) {

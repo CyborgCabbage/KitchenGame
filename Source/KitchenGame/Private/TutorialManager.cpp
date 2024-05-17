@@ -21,7 +21,7 @@ bool UTutorialStep::IsPassed()
 }
 
 // Sets default values
-ATutorialManager::ATutorialManager()
+ATutorialManager::ATutorialManager() : HasResetUI(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -53,9 +53,14 @@ void ATutorialManager::Tick(float DeltaTime)
 	Highlighted = nullptr;
 	//
 	if (!IsActive) {
-		SetInstruction({});
-		OnHighlightChange(Highlighted);
+		if(!HasResetUI) {
+			SetInstruction({});
+			OnHighlightChange(Highlighted);
+			HasResetUI = true;
+		}
 		return;
+	}else {
+		HasResetUI = false;
 	}
 	//Select current step
 	for (CurrentStep = 0; CurrentStep < Steps.Num(); CurrentStep++) {
