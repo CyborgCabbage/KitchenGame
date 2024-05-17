@@ -79,4 +79,10 @@ public:
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LockPoint")
 	TArray<UClass*> AllowedClasses;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "LockPoint")
+	float TriggerRadius;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "LockPoint")
+	float TriggerHeight;
 };
