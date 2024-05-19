@@ -47,14 +47,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	ALockPointTrigger* GetTriggerActor(bool& Enabled);
 
-public:
-	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LockPoint")
-	bool AllowStack;
-
-	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "LockPoint")
-	bool AlwaysEnabled;
 protected:
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, Category = "LockPoint")

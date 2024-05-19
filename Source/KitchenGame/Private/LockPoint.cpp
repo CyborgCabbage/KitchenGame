@@ -23,9 +23,7 @@ void ULockPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(AlwaysEnabled) {
-		SetEnabled(true);
-	}
+	SetEnabled(true);
 	
 }
 
@@ -46,22 +44,6 @@ void ULockPoint::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ULockPoint::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if(AlwaysEnabled) return;
-	if (InUse) {
-		InUse = IsValid(LockedItem);
-		return;
-	}
-	if(auto* grabbable = GetOwner()->GetComponentByClass<UGrabbable>()) {
-		if(grabbable->IsLocked) {
-			auto lp = grabbable->LockPoint;
-			if(!lp->AlwaysEnabled || lp->AllowStack) {
-				SetEnabled(true);
-				return;
-			}
-		}
-	}
-	SetEnabled(false);
 }
 
 void ULockPoint::SetEnabled(bool Enabled) {

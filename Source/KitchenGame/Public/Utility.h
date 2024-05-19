@@ -30,4 +30,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void DestroyActorAndAttached(AActor* Actor);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static void GetActorAndAttached(TArray<AActor*>& OutActors, AActor* Actor);
 };

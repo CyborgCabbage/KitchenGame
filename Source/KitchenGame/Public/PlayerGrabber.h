@@ -37,10 +37,15 @@ private:
 	ALockPointTrigger* OverlapLockPoint();
 
 	ALockPointTrigger* GetTargetLockPoint();
+
+	bool OverLockPoint;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
 	void TryDropToLockPoint();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsOverLockPoint();
 };

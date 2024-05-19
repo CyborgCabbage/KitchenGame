@@ -151,6 +151,9 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	//Update visual
 	if(auto* LockPointTrigger = GetTargetLockPoint()) {
 		LockPointTrigger->SetEnableVisual();
+		OverLockPoint = true;
+	}else{
+		OverLockPoint = false;
 	}
 }
 
@@ -163,4 +166,8 @@ void UPlayerGrabber::TryDropToLockPoint()
 	if (LockPointTrigger) {
 		LockPointTrigger->ParentLockPoint->LockItem(Grabbable);
 	}
+}
+
+bool UPlayerGrabber::IsOverLockPoint() {
+	return OverLockPoint;
 }
