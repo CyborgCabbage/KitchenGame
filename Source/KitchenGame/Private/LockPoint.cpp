@@ -90,17 +90,18 @@ void ULockPoint::LockItem(UGrabbable* Grabbed) {
 	//UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->BottomPoint, this, false);
 	LockedItem = Grabbed;
 	InUse = true;
+	LockedItem->GrabTarget->SetWorldTransform(UUtility::MoveToTransform2(LockedItem->GrabTarget, LockedItem->GrabTarget->GetSocketTransform("Bottom"), GetComponentTransform(), false));
 	LockedItem->SetEnablePhysics(false, true);
 	LockedItem->IsLocked = true;
 	LockedItem->LockPoint = this;
-	LockedItem->GetOwner()->AttachToComponent(this, { EAttachmentRule::KeepWorld, true});
-	LockedItem->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
+	LockedItem->GetOwner()->AttachToActor(GetOwner(), {EAttachmentRule::KeepWorld, true});
+	/*LockedItem->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
 	LockedItem->GetOwner()->SetActorRelativeRotation(FQuat::Identity);
 	FTransform SocketTransform = LockedItem->GrabTarget->GetSocketTransform("Bottom").GetRelativeTransform(GetComponentTransform());
 	SocketTransform.SetScale3D(FVector::OneVector);
 	SocketTransform = SocketTransform.Inverse();
 	LockedItem->GetOwner()->SetActorRelativeLocation(SocketTransform.GetLocation());
-	LockedItem->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());
+	LockedItem->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());*/
 	SetEnabled(false);
 }
 

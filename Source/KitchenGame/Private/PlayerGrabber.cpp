@@ -26,15 +26,16 @@ bool UPlayerGrabber::FinishPickup() {
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Failed to pick up object, could not find Hand"));
 			return false;
 		}
+		Grabbed->GrabTarget->SetWorldTransform(UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetSocketTransform("Grab"), Hand->GetComponentTransform(), false));
 		Grabbed->SetEnablePhysics(false, false);
 		Grabbed->GetOwner()->AttachToComponent(Hand, {EAttachmentRule::KeepWorld, true});
-		Grabbed->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
+		/*Grabbed->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
 		Grabbed->GetOwner()->SetActorRelativeRotation(FQuat::Identity);
 		FTransform SocketTransform = Grabbed->GrabTarget->GetSocketTransform("Grab").GetRelativeTransform(Hand->GetComponentTransform());
 		SocketTransform.SetScale3D(FVector::OneVector);
 		SocketTransform = SocketTransform.Inverse();
 		Grabbed->GetOwner()->SetActorRelativeLocation(SocketTransform.GetLocation());
-		Grabbed->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());
+		Grabbed->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());*/
 		//UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
 		AttachedToHand = true;
 		return true;
