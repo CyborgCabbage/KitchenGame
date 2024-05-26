@@ -56,10 +56,10 @@ void AChefCharacter::ResetAttackCooldown()
 
 TArray<AActor*> AChefCharacter::TraceAttack(FVector Start, FVector End)
 {
-	FCollisionQueryParams Params(TEXT("TraceAttack"));
+	FCollisionQueryParams Params(TEXT("PlayerAttack"));
 	Params.AddIgnoredActor(this);
 	TArray<FHitResult> OutHits;
-	bool Result = GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(20.0f), Params);
+	bool Result = GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_GameTraceChannel2 /*Attack Trace*/, FCollisionShape::MakeSphere(20.0f), Params);
 	TArray<AActor*> HitActors;
 	for (const auto& Hit : OutHits) {
 		if(!Hit.bBlockingHit) {
