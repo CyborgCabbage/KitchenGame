@@ -111,8 +111,8 @@ void UUtility::DestroyActorAndAttached(AActor* Actor)
 }
 
 void UUtility::GetActorAndAttached(TArray<AActor*>& OutActors, AActor* Actor) {
-	Actor->GetAttachedActors(OutActors, true, true);
 	OutActors.Add(Actor);
+	Actor->GetAttachedActors(OutActors, false, true);
 }
 
 
