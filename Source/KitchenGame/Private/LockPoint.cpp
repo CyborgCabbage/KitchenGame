@@ -72,7 +72,7 @@ void ULockPoint::LockItem(UGrabbable* Grabbed) {
 	//UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->BottomPoint, this, false);
 	LockedItem = Grabbed;
 	InUse = true;
-	LockedItem->GrabTarget->SetWorldTransform(UUtility::MoveToTransform2(LockedItem->GrabTarget, LockedItem->GrabTarget->GetSocketTransform("Bottom"), GetComponentTransform(), false));
+	LockedItem->GrabTarget->SetWorldTransform(GetLockItemTransform(Grabbed));
 	LockedItem->SetEnablePhysics(false, true);
 	LockedItem->IsLocked = true;
 	LockedItem->LockPoint = this;
@@ -85,6 +85,11 @@ void ULockPoint::LockItem(UGrabbable* Grabbed) {
 	LockedItem->GetOwner()->SetActorRelativeLocation(SocketTransform.GetLocation());
 	LockedItem->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());*/
 	SetEnabled(false);
+}
+
+FTransform ULockPoint::GetLockItemTransform(UGrabbable* Grabbed)
+{
+	return UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetSocketTransform("Bottom"), GetComponentTransform(), false);
 }
 
 void ULockPoint::UnlockItem() {
