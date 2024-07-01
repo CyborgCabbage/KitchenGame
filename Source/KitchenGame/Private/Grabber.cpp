@@ -57,11 +57,13 @@ bool UGrabber::FinishPickup() {
 	if(auto* SkelMesh = Cast<USkeletalMeshComponent>(Grabbed->GrabTarget)) {
 		BoneName = SkelMesh->GetSocketBoneName("Grab");
 	}
+	//TODO: this is scuffed, remove the grab lockpoint if we are not using it
+	FName Socket = Grabbed->GrabTarget->DoesSocketExist("Bottom") ? "Bottom" : "Grab";
 	PhysicsHandle->GrabComponentAtLocationWithRotation(
 		Grabbed->GrabTarget,
 		BoneName,
-		Grabbed->GrabTarget->GetSocketLocation("Grab"),
-		Grabbed->GrabTarget->GetSocketRotation("Grab")
+		Grabbed->GrabTarget->GetSocketLocation(Socket),
+		Grabbed->GrabTarget->GetSocketRotation(Socket)
 	);
 	return IsValid(PhysicsHandle->GetGrabbedComponent());
 }

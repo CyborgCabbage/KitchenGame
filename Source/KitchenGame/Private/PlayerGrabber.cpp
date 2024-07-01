@@ -6,6 +6,8 @@
 #include "Utility.h"
 #include "LockPoint.h"
 #include "Engine/SkeletalMesh.h"
+#include "Kismet/GameplayStatics.h"
+#include "Math/UnrealMathUtility.h"
 
 UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), DropDistance(100), GrabDistance(120), TraceDistance(150), TraceRadius(5) {
 }
@@ -128,32 +130,38 @@ ALockPointTrigger* UPlayerGrabber::OverlapLockPoint() {
 
 ALockPointTrigger* UPlayerGrabber::GetTargetLockPoint() {
 	ALockPointTrigger* LockPointTrigger = nullptr;
-	if (AttachedToHand) {
+	LockPointTrigger = TraceLockPoint();
+	/*if (AttachedToHand) {
 		LockPointTrigger = TraceLockPoint();
 	} else {
 		LockPointTrigger = OverlapLockPoint();
 		if(!LockPointTrigger) {
 			LockPointTrigger = TraceLockPoint();
 		}
-	}
+	}*/
 	return LockPointTrigger;
 }
 
 void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	UGrabber::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	//Move grabbed to location
-	if (IsValid(Grabbed) && !AttachedToHand) {
-		FVector Begin = View->GetComponentTransform().GetLocation();
-		FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
-		SetTarget(Begin + Direction * GrabDistance, FRotator{0, View->GetComponentRotation().Yaw, 0});
-	}
+	FVector Begin = View->GetComponentTransform().GetLocation();
+	FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
+	FTransform Target{ FRotator{ 0, View->GetComponentRotation().Yaw, 0 }, Begin + Direction * GrabDistance};
 	//Update visual
 	if(auto* LockPointTrigger = GetTargetLockPoint()) {
 		LockPointTrigger->SetEnableVisual();
+		Target = LockPointTrigger->ParentLockPoint->GetLockItemTransform(Grabbed);
+		float Sinus = (sinf(UGameplayStatics::GetRealTimeSeconds(this) * 2 * PI / 1.5f) + 2.0f) * 1.5f;
+		Target.AddToTranslation(LockPointTrigger->GetActorUpVector().GetUnsafeNormal() * Sinus);
+		Target.SetTranslation(FMath::Lerp(Target.GetTranslation(), Begin + Direction * GrabDistance, 0.2f));
 		OverLockPoint = true;
 	}else{
 		OverLockPoint = false;
+	}
+	//Move grabbed to location
+	if (IsValid(Grabbed) && !AttachedToHand) {
+		SetTarget(Target.GetLocation(), Target.Rotator());
 	}
 }
 

@@ -37,6 +37,10 @@ public:
 
 	/** Please add a function description */
 	UFUNCTION(BlueprintCallable)
+	FTransform GetLockItemTransform(UGrabbable* Grabbed);
+
+	/** Please add a function description */
+	UFUNCTION(BlueprintCallable)
 	void UnlockItem();
 
 	/** Please add a function description */
