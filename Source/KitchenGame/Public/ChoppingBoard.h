@@ -33,7 +33,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	bool CanChop(const AActor* target, FChopResult& result);
+	AActor* GetLockedItem();
+
+	UFUNCTION(BlueprintCallable)
+	bool CanChop(FChopResult& result);
 
 	UFUNCTION(BlueprintCallable)
 	void TryChop();

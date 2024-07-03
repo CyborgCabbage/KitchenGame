@@ -38,8 +38,17 @@ void AChoppingBoard::Tick(float DeltaTime)
 
 }
 
-bool AChoppingBoard::CanChop(const AActor* target, FChopResult& result)
+AActor* AChoppingBoard::GetLockedItem()
 {
+	auto* lockPoint = GetLockPoint();
+	if (!lockPoint->InUse) return nullptr;
+	return lockPoint->LockedItem->GetOwner();
+}
+
+bool AChoppingBoard::CanChop(FChopResult& result)
+{
+	auto* target = GetLockedItem();
+	if (!IsValid(target)) return false;
 	//Get chop recipes
 	auto* gamemode = GetWorld()->GetAuthGameMode();
 	if (!gamemode->GetClass()->ImplementsInterface(URecipeProvider::StaticClass())) return false;
@@ -57,7 +66,7 @@ void AChoppingBoard::TryChop()
 	if (!lockPoint->InUse) return;
 	auto* chopTarget = lockPoint->LockedItem->GetOwner();
 	FChopResult result;
-	if (!CanChop(chopTarget, result)) return;
+	if (!CanChop(result)) return;
 	FTransform transform = chopTarget->GetActorTransform();
 	lockPoint->UnlockItem();
 	chopTarget->Destroy();

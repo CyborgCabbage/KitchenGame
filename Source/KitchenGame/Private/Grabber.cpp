@@ -53,17 +53,20 @@ void UGrabber::TryPickup(UGrabbable* grabbable)
 	if (!CanPickup(grabbable)) return;
 	if (IsValid(Grabbed)) return;
 	UGrabber* stolenFrom = grabbable->IsGrabbed ? grabbable->Grabber : nullptr;
+	grabbable->UnlockIfLocked();
+	if (grabbable->IsGrabbed && IsValid(grabbable->Grabber)) {
+		grabbable->Grabber->TryDrop();
+	}
 	Grabbed = grabbable;
 	Grabbed->IsGrabbed = true;
 	Grabbed->Grabber = this;
-	Grabbed->UnlockIfLocked();
 	if(!FinishPickup()) {
 		Grabbed->IsGrabbed = false;
 		Grabbed->Grabber = nullptr;
 		Grabbed = nullptr;
 	}
 	if (stolenFrom) {
-		stolenFrom->OnStolenDelegate.Execute(grabbable);
+		stolenFrom->OnStolenDelegate.ExecuteIfBound(grabbable);
 	}
 }
 
