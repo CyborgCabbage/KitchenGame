@@ -9,6 +9,14 @@
 
 class UGrabbable;
 
+UENUM(BlueprintType)
+enum class EGrabberOwner : uint8 {
+	IMP,
+	PLAYER
+};
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnStolenSignature, UGrabbable*, grabbable);
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class KITCHENGAME_API UGrabber : public UActorComponent {
 	GENERATED_BODY()
@@ -33,6 +41,9 @@ public:
 	void SetTarget(FVector Location, FRotator Rotation);
 
 	UFUNCTION(BlueprintCallable)
+	bool CanPickup(UGrabbable* Grabbable);
+
+	UFUNCTION(BlueprintCallable)
 	void TryPickup(UGrabbable* Grabbable);
 
 	UFUNCTION(BlueprintCallable)
@@ -44,5 +55,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsGrabbing();
 
-	void OnGrabbedDestroyed(AActor* DestroyedActor);
+	UPROPERTY(BlueprintReadWrite)
+	FOnStolenSignature OnStolenDelegate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EGrabberOwner GrabberOwner;
 };
