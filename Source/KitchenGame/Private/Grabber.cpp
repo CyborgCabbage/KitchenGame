@@ -10,6 +10,7 @@ UGrabber::UGrabber() {
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	Grabbed = nullptr;
+	GrabberOwner = EGrabberOwner::IMP;
 }
 
 
@@ -31,18 +32,41 @@ void UGrabber::SetTarget(FVector Location, FRotator Rotation)
 	PhysicsHandle->SetTargetLocationAndRotation(Location, Rotation);
 }
 
+bool UGrabber::CanPickup(UGrabbable* grabbable)
+{
+	//Duh
+	if (!grabbable->CanGrab) return false;
+	//Both players and imps can pickup locked stuff
+	if(grabbable->IsLocked) return true;
+	//If an imp owns it, no one can take it (not even other imps)
+	if (grabbable->IsGrabbed) {
+		if (grabbable->Grabber->GrabberOwner == EGrabberOwner::IMP) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void UGrabber::TryPickup(UGrabbable* grabbable)
 {
-	if (!grabbable->CanGrab) return;
+	if (!IsValid(grabbable)) return;
+	if (!CanPickup(grabbable)) return;
 	if (IsValid(Grabbed)) return;
+	UGrabber* stolenFrom = grabbable->IsGrabbed ? grabbable->Grabber : nullptr;
+	grabbable->UnlockIfLocked();
+	if (grabbable->IsGrabbed && IsValid(grabbable->Grabber)) {
+		grabbable->Grabber->TryDrop();
+	}
 	Grabbed = grabbable;
 	Grabbed->IsGrabbed = true;
 	Grabbed->Grabber = this;
-	Grabbed->UnlockIfLocked();
 	if(!FinishPickup()) {
 		Grabbed->IsGrabbed = false;
 		Grabbed->Grabber = nullptr;
 		Grabbed = nullptr;
+	}
+	if (stolenFrom) {
+		stolenFrom->OnStolenDelegate.ExecuteIfBound(grabbable);
 	}
 }
 

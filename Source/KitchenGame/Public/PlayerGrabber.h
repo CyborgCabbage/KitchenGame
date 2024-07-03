@@ -25,14 +25,7 @@ private:
 	TObjectPtr<USceneComponent> View;
 	TObjectPtr<USceneComponent> Hand;
 	bool AttachedToHand;
-	UPROPERTY(EditDefaultsOnly)
-	float DropDistance;
-	UPROPERTY(EditDefaultsOnly)
-	float GrabDistance;
-	UPROPERTY(EditDefaultsOnly)
-	float TraceDistance;
-	UPROPERTY(EditDefaultsOnly)
-	float TraceRadius;
+
 	ALockPointTrigger* TraceLockPoint();
 	ALockPointTrigger* OverlapLockPoint();
 
@@ -48,4 +41,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsOverLockPoint();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DropDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float GrabDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TraceDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TraceRadius;
 };

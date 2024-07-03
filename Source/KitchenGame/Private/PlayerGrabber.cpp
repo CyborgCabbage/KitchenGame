@@ -10,6 +10,7 @@
 #include "Math/UnrealMathUtility.h"
 
 UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), DropDistance(100), GrabDistance(120), TraceDistance(150), TraceRadius(5) {
+	GrabberOwner = EGrabberOwner::PLAYER;
 }
 
 void UPlayerGrabber::BeginPlay()
