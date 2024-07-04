@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{287BEA05-4E73-BDFF-C0BA-E0BE1C6BEC5D}",
+	"EngineAssociation": "{A37A92AF-44D9-396B-DDC6-B78245DE5F04}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -23,10 +23,6 @@
 		},
 		{
 			"Name": "GeometryScripting",
-			"Enabled": true
-		},
-		{
-			"Name": "NiagaraFluids",
 			"Enabled": true
 		}
 	]
