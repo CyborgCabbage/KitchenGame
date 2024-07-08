@@ -6,6 +6,15 @@
 #include "GameFramework/Actor.h"
 #include "AIngredient.generated.h"
 
+UENUM(BlueprintType)
+enum class ESauceType : uint8
+{
+	None,
+	Tomato,
+	Hot,
+	Slime
+};
+
 USTRUCT(BlueprintType)
 struct FIngredientStatus
 {
@@ -15,19 +24,23 @@ struct FIngredientStatus
 
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Cooked;
+	FLinearColor ColorA;
 
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Fried;
+	FLinearColor ColorB;
 	
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Burnt;
+	float Progress;
 
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float OverFried;
+	FLinearColor SauceColor;
+
+	/** */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SauceProgress;
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -54,6 +67,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient State")
 	double FryAmount;
 	
+	/** The applied sauce type */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient State")
+	ESauceType SauceType;
+
 	//Cooking Times
 	
 	/** How long it takes to cook */
@@ -85,6 +102,32 @@ public:
 	/** The ID of the ingredient */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	FString IngredientID;
+
+	/** How long it takes to burn */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Config")
+	bool PreciseCooking;
+
+	//Colors
+
+	/** How long it takes to cook */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
+	FLinearColor RawColor;
+
+	/** How long before it starts burning */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
+	FLinearColor CookColor;
+
+	/** How long it takes to burn */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
+	FLinearColor BurnColor;
+
+	/** How long before it starts burning */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
+	FLinearColor FryColor;
+
+	/** How long it takes to burn */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
+	FLinearColor OverFryColor;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
