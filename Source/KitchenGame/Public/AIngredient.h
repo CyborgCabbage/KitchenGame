@@ -103,6 +103,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
 	FString IngredientID;
 
+	/** How long it takes to burn */
+	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Config")
+	bool PreciseCooking;
+
 	//Colors
 
 	/** How long it takes to cook */

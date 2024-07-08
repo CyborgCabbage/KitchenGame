@@ -19,6 +19,7 @@ AIngredient::AIngredient() :
 	FryColor(1.0f, 0.4f, 0.04f),
 	OverFryColor(0.2f, 0.1f, 0),
 	SauceType(ESauceType::None),
+	PreciseCooking(false),
 	IngredientID("")
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -43,6 +44,7 @@ void AIngredient::Tick(float DeltaTime)
 FIngredientStatus AIngredient::GetStatus() const
 {
 	float Cooked = FMath::Clamp(CookAmount / CookTime, 0, 1);
+	float PreciseCooked = FMath::Clamp((CookAmount - CookTime) / CookedTime, 0, 3);
 	float Burnt = FMath::Clamp((CookAmount - CookTime - CookedTime) / BurnTime, 0, 1);
 	float Fried = FMath::Clamp(FryAmount / FryTime, 0, 1);
 	float OverFried = FMath::Clamp((FryAmount - FryTime - FriedTime) / OverFryTime, 0, 1);
@@ -74,6 +76,26 @@ FIngredientStatus AIngredient::GetStatus() const
 		status.ColorA = FryColor;
 		status.ColorB = OverFryColor;
 		status.Progress = OverFried;
+	}
+	else if (PreciseCooking && PreciseCooked > 0) {
+		if (PreciseCooked < 1) {
+			//Rare
+			status.ColorA = RawColor;
+			status.ColorB = FMath::Lerp(RawColor, CookColor, 1.0f / 3.0f);
+			status.Progress = PreciseCooked;
+		}
+		else if (PreciseCooked < 2) {
+			//Medium Rare
+			status.ColorA = FMath::Lerp(RawColor, CookColor, 1.0f / 3.0f);
+			status.ColorB = FMath::Lerp(RawColor, CookColor, 2.0f / 3.0f);
+			status.Progress = PreciseCooked - 1.0f;
+		}
+		else {
+			//Well Done
+			status.ColorA = FMath::Lerp(RawColor, CookColor, 2.0f / 3.0f);
+			status.ColorB = CookColor;
+			status.Progress = PreciseCooked - 2.0f;
+		}
 	}
 	else if (Cooked > 0 && Cooked > Fried) {
 		status.ColorA = RawColor;
