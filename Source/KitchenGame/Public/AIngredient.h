@@ -104,7 +104,7 @@ public:
 	FString IngredientID;
 
 	/** How long it takes to burn */
-	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Config")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Ingredient Config")
 	bool PreciseCooking;
 
 	//Colors
