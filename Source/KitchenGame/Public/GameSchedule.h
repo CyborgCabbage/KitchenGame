@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RecipeDataAsset.h"
+#include "GameSchedule.generated.h"
 
 USTRUCT(BlueprintType)
 struct FConfiguredRecipe
@@ -12,10 +14,13 @@ public:
 	FConfiguredRecipe();
 
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<> Tutorial;
+	TObjectPtr<URecipeDataAsset> RecipeAsset;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<> Tutorial;
+	ESecondaryCookPhase ModifierCookPhase;
+
+	UPROPERTY(BlueprintReadWrite)
+	ESauceType ModifierSauceType;
 };
 
 /**
@@ -32,5 +37,5 @@ public:
 	bool Tutorial;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<> Tutorial;
+	TArray<FConfiguredRecipe> Recipes;
 };

@@ -31,7 +31,7 @@ enum class EPrimaryCookPhase : uint8
 UENUM(BlueprintType)
 enum class ESecondaryCookPhase : uint8
 {
-	Other,
+	None,
 	Rare,
 	Medium,
 	WellDone
