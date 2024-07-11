@@ -7,20 +7,8 @@
 AIngredient::AIngredient() :
 	CookAmount(0),
 	FryAmount(0),
-	CookTime(10),
-	CookedTime(10),
-	BurnTime(10),
-	FryTime(10),
-	FriedTime(10),
-	OverFryTime(10),
-	RawColor(1, 1, 1),
-	CookColor(0.7f, 0.7f, 0.7f),
-	BurnColor(0, 0, 0),
-	FryColor(1.0f, 0.4f, 0.04f),
-	OverFryColor(0.2f, 0.1f, 0),
 	SauceType(ESauceType::None),
-	PreciseCooking(false),
-	IngredientID("")
+	Data(nullptr)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -43,11 +31,11 @@ void AIngredient::Tick(float DeltaTime)
 
 FIngredientStatus AIngredient::GetStatus() const
 {
-	float Cooked = FMath::Clamp(CookAmount / CookTime, 0, 1);
-	float PreciseCooked = FMath::Clamp((CookAmount - CookTime) / CookedTime * 3, 0, 3);
-	float Burnt = FMath::Clamp((CookAmount - CookTime - CookedTime) / BurnTime, 0, 1);
-	float Fried = FMath::Clamp(FryAmount / FryTime, 0, 1);
-	float OverFried = FMath::Clamp((FryAmount - FryTime - FriedTime) / OverFryTime, 0, 1);
+	float Cooked = FMath::Clamp(CookAmount / Data->CookTime, 0, 1);
+	float PreciseCooked = FMath::Clamp((CookAmount - Data->CookTime) / Data->CookedTime * 3, 0, 3);
+	float Burnt = FMath::Clamp((CookAmount - Data->CookTime - Data->CookedTime) / Data->BurnTime, 0, 1);
+	float Fried = FMath::Clamp(FryAmount / Data->FryTime, 0, 1);
+	float OverFried = FMath::Clamp((FryAmount - Data->FryTime - Data->FriedTime) / Data->OverFryTime, 0, 1);
 	FIngredientStatus status;
 	switch (SauceType) {
 	case ESauceType::None:
@@ -68,74 +56,84 @@ FIngredientStatus AIngredient::GetStatus() const
 		break;
 	}
 	if (Burnt > 0.0f && Burnt > OverFried) {
-		status.ColorA = CookColor;
-		status.ColorB = BurnColor;
+		status.ColorA = Data->CookColor;
+		status.ColorB = Data->BurnColor;
 		status.Progress = Burnt;
 	}
 	else if(OverFried > 0) {
-		status.ColorA = FryColor;
-		status.ColorB = OverFryColor;
+		status.ColorA = Data->FryColor;
+		status.ColorB = Data->OverFryColor;
 		status.Progress = OverFried;
 	}
-	else if (PreciseCooking && PreciseCooked > 0) {
+	else if (Data->PreciseCooking && PreciseCooked > 0) {
 		if (PreciseCooked < 1) {
 			//Rare
-			status.ColorA = FMath::Lerp(RawColor, CookColor, 1.0f / 4.0f);
-			status.ColorB = FMath::Lerp(RawColor, CookColor, 2.0f / 4.0f);
+			status.ColorA = FMath::Lerp(Data->RawColor, Data->CookColor, 1.0f / 4.0f);
+			status.ColorB = FMath::Lerp(Data->RawColor, Data->CookColor, 2.0f / 4.0f);
 			status.Progress = PreciseCooked;
 		}
 		else if (PreciseCooked < 2) {
 			//Medium Rare
-			status.ColorA = FMath::Lerp(RawColor, CookColor, 2.0f / 4.0f);
-			status.ColorB = FMath::Lerp(RawColor, CookColor, 3.0f / 4.0f);
+			status.ColorA = FMath::Lerp(Data->RawColor, Data->CookColor, 2.0f / 4.0f);
+			status.ColorB = FMath::Lerp(Data->RawColor, Data->CookColor, 3.0f / 4.0f);
 			status.Progress = PreciseCooked - 1.0f;
 		}
 		else {
 			//Well Done
-			status.ColorA = FMath::Lerp(RawColor, CookColor, 3.0f / 4.0f);
-			status.ColorB = CookColor;
+			status.ColorA = FMath::Lerp(Data->RawColor, Data->CookColor, 3.0f / 4.0f);
+			status.ColorB = Data->CookColor;
 			status.Progress = PreciseCooked - 2.0f;
 		}
 	}
 	else if (Cooked > 0 && Cooked > Fried) {
-		status.ColorA = RawColor;
-		status.ColorB = PreciseCooking ? FMath::Lerp(RawColor, CookColor, 1.0f / 4.0f) : CookColor;
+		status.ColorA = Data->RawColor;
+		status.ColorB = Data->PreciseCooking ? FMath::Lerp(Data->RawColor, Data->CookColor, 1.0f / 4.0f) : Data->CookColor;
 		status.Progress = Cooked;
 	}
 	else if (Fried > 0) {
-		status.ColorA = RawColor;
-		status.ColorB = FryColor;
+		status.ColorA = Data->RawColor;
+		status.ColorB = Data->FryColor;
 		status.Progress = Fried;
 	}
 	else {
-		status.ColorA = RawColor;
-		status.ColorB = RawColor;
+		status.ColorA = Data->RawColor;
+		status.ColorB = Data->RawColor;
 		status.Progress = 0.0f;
 	}
 	return status;
 }
 
-FString AIngredient::GetPhase() const 
+FFullCookPhase AIngredient::GetPhase() const
 {
-	if (CookAmount > CookTime + CookedTime) {
-		return "burned";
+	FFullCookPhase FCP;
+	if (CookAmount > Data->CookTime + Data->CookedTime) {
+		return { EPrimaryCookPhase::Burnt };
 	}
-	if (FryAmount > FryTime + FriedTime) {
-		return "overfried";
+	if (FryAmount > Data->FryTime + Data->FriedTime) {
+		return { EPrimaryCookPhase::OverFried };
 	}
-	if (CookAmount > CookTime) {
-		return "cooked";
+	if (CookAmount > Data->CookTime) {
+		double Mapped = FMath::GetMappedRangeValueClamped(TRange<double>{ Data->CookTime, Data->CookTime + Data->CookedTime }, TRange<double>{0, 3}, CookAmount);
+		if(Mapped < 1) {
+			return { EPrimaryCookPhase::Cooked, ESecondaryCookPhase::Rare };
+		}
+		else if (Mapped < 2) {
+			return { EPrimaryCookPhase::Cooked, ESecondaryCookPhase::Medium };
+		}
+		else {
+			return { EPrimaryCookPhase::Cooked, ESecondaryCookPhase::WellDone };
+		}
 	}
-	if (FryAmount > FryTime) {
-		return "fried";
+	if (FryAmount > Data->FryTime) {
+		return { EPrimaryCookPhase::Fried };
 	}
 	if (CookAmount > 0) {
-		return "cooking";
+		return { EPrimaryCookPhase::Cooking };
 	}
 	if (FryAmount > 0) {
-		return "frying";
+		return { EPrimaryCookPhase::Frying };
 	}
-	return "raw";
+	return {};
 }
 
 FIngredientStatus::FIngredientStatus() :
@@ -144,5 +142,11 @@ FIngredientStatus::FIngredientStatus() :
 	Progress(0.5f),
 	SauceColor(FColor::Magenta),
 	SauceProgress(1.0f)
+{
+}
+
+FFullCookPhase::FFullCookPhase(EPrimaryCookPhase Primary, ESecondaryCookPhase Secondary) :
+	Primary(Primary),
+	Secondary(Secondary)
 {
 }
