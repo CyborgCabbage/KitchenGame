@@ -77,7 +77,7 @@ void UPlayerGrabber::FinishDrop() {
 		QueryParams.AddIgnoredActors(Attached);
 		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * TraceDistance, OriginTransform.GetRotation(), ECollisionChannel::ECC_Camera, QueryParams);
 		FVector Location = Begin + Direction * TraceDistance;
-		for (const FHitResult Hit : OutHits) {
+		for (const FHitResult& Hit : OutHits) {
 			if (!Hit.bBlockingHit) continue;
 			Location = Hit.Location;
 			break;
