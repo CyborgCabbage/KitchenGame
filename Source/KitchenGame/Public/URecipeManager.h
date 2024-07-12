@@ -5,10 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "AIngredient.h"
+/*
 #include "URecipeManager.generated.h"
-/**
- * 
- */
+
 
 USTRUCT(BlueprintType)
 struct FPresentationRecipe : public FTableRowBase
@@ -20,11 +19,11 @@ public:
     FPresentationRecipe()
     {}
 
-    /** The stack of ingredients and utensils that should be on the presentation bench */
+    /// The stack of ingredients and utensils that should be on the presentation bench 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
     TArray<FString> ResultStack;
 
-    /** How long the player will have to complete the recipe*/
+    // How long the player will have to complete the recipe
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
     int TimeSeconds;
 };
@@ -39,11 +38,11 @@ public:
     FCookingRecipe()
     {}
 
-    /** Input ingredient ids for the recipe */
+    // Input ingredient ids for the recipe
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
     TArray<FString> RecipeInput;
 
-    /** Output ingredient ids for the recipe */
+    // Output ingredient ids for the recipe
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Recipe)
     TArray<FString> RecipeOutput;
 };
@@ -53,15 +52,15 @@ struct FTryRecipeResult
 {
     GENERATED_USTRUCT_BODY()
 
-    /**  */
+    //
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     bool Success;
 
-    /** */
+    //
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TArray<TSubclassOf<AActor>> ToCreate;
 
-    /** */
+    //
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TArray<AActor*> ToDestroy;
 };
@@ -76,11 +75,11 @@ struct FScoreDeduction
     FScoreDeduction(int ScoreDelta, const FString& Reason) : ScoreDelta(ScoreDelta), Reason(Reason)
     {}
 
-    /**  */
+    //
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int ScoreDelta;
 
-    /** */
+    //
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Reason;
 };
@@ -92,9 +91,6 @@ class KITCHENGAME_API URecipeManager : public UObject
 public:
 	URecipeManager();
 	~URecipeManager();
-
-    UFUNCTION(BlueprintCallable, Category = Recipe)
-    FTryRecipeResult TryChop(AActor* ingredient);
 
     UFUNCTION(BlueprintCallable, Category = Recipe)
     FTryRecipeResult TryBlend(const TArray<AActor*>& ingredients);
@@ -126,7 +122,7 @@ private:
     };
     struct MatchRequirement {
         FString ClassName;
-        TOptional<FString> Phase;
+        TOptional<EPrimaryCookPhase> Phase;
     };
     MatchRequirement ParseMatchString(const FString& String);
     MatchStatus MatchItem(AIngredient* Presented, MatchRequirement Requirement);
@@ -136,3 +132,4 @@ private:
     UPROPERTY()
     TMap<FString, TSubclassOf<AActor>> NameToClass;
 };
+*/

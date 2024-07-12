@@ -9,7 +9,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 
-UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), DropDistance(100), GrabDistance(120), TraceDistance(150), TraceRadius(5) {
+UPlayerGrabber::UPlayerGrabber() : 
+	AttachedToHand(false), 
+	OverLockPoint(false), 
+	DropDistance(100), 
+	GrabDistance(120), 
+	TraceDistance(150), 
+	TraceRadius(5) 
+{
 	GrabberOwner = EGrabberOwner::PLAYER;
 }
 
@@ -70,7 +77,7 @@ void UPlayerGrabber::FinishDrop() {
 		QueryParams.AddIgnoredActors(Attached);
 		Grabbed->GetWorld()->ComponentSweepMultiByChannel(OutHits, Grabbed->GrabTarget, Begin, Begin + Direction * TraceDistance, OriginTransform.GetRotation(), ECollisionChannel::ECC_Camera, QueryParams);
 		FVector Location = Begin + Direction * TraceDistance;
-		for (const FHitResult Hit : OutHits) {
+		for (const FHitResult& Hit : OutHits) {
 			if (!Hit.bBlockingHit) continue;
 			Location = Hit.Location;
 			break;
@@ -178,5 +185,5 @@ void UPlayerGrabber::TryDropToLockPoint()
 }
 
 bool UPlayerGrabber::IsOverLockPoint() {
-	return OverLockPoint;
+	return OverLockPoint && IsValid(Grabbed);
 }

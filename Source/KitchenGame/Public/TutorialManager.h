@@ -87,7 +87,7 @@ public:
 	TArray<AActor*> GetGrabbingClass(TSubclassOf<AActor> ActorClass);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	TArray<AActor*> FilterPhase(const TArray<AActor*>& Actors, FString Phase);
+	TArray<AActor*> FilterPhase(const TArray<AActor*>& Actors, EPrimaryCookPhase Phase);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	void FilterAbove(const TArray<AActor*>& Actors, TSubclassOf<AActor> AboveClass, TArray<AActor*>& ActorsTop, TArray<AActor*>& ActorsBottom);

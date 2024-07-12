@@ -115,4 +115,14 @@ void UUtility::GetActorAndAttached(TArray<AActor*>& OutActors, AActor* Actor) {
 	Actor->GetAttachedActors(OutActors, false, true);
 }
 
+ESecondaryCookPhase UUtility::GetRandomCookPhase()
+{
+	return (ESecondaryCookPhase)FMath::RandRange(1, 3);
+}
+
+ESauceType UUtility::GetRandomSauceType()
+{
+	return (ESauceType)FMath::RandRange(1, 3);
+}
+
 

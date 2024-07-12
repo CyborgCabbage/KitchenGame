@@ -3,7 +3,7 @@
 
 #include "URecipeManager.h"
 #include "Engine/GameEngine.h"
-
+/*
 URecipeManager::URecipeManager()
 {
 }
@@ -135,7 +135,7 @@ URecipeManager::MatchStatus URecipeManager::MatchItem(AIngredient* Presented, Ma
 		if (!Requirement.Phase) {
 			return MatchStatus::Perfect;
 		}
-		if (Presented->GetPhase() == Requirement.Phase.GetValue()) {
+		if (Presented->GetPhase().Primary == Requirement.Phase.GetValue()) {
 			return MatchStatus::Perfect;
 		}
 		else {
@@ -253,3 +253,4 @@ void URecipeManager::InitClassTable()
 		if (c) NameToClass.Add({ c->GetName(), c });
 	}
 }
+*/

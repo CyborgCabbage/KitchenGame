@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "AIngredient.generated.h"
 
+class UIngredientDataAsset;
+
 UENUM(BlueprintType)
 enum class ESauceType : uint8
 {
@@ -13,6 +15,43 @@ enum class ESauceType : uint8
 	Tomato,
 	Hot,
 	Slime
+};
+
+UENUM(BlueprintType)
+enum class EPrimaryCookPhase : uint8
+{
+	Raw,
+	Frying,
+	Fried,
+	OverFried,
+	Cooking,
+	Cooked,
+	Burnt
+};
+
+UENUM(BlueprintType)
+enum class ESecondaryCookPhase : uint8
+{
+	None,
+	Rare,
+	Medium,
+	WellDone
+};
+
+USTRUCT(BlueprintType)
+struct FFullCookPhase 
+{
+	GENERATED_USTRUCT_BODY()
+
+	FFullCookPhase(EPrimaryCookPhase Primary = EPrimaryCookPhase::Raw, ESecondaryCookPhase Secondary = ESecondaryCookPhase::None);
+
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EPrimaryCookPhase Primary;
+
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ESecondaryCookPhase Secondary;
 };
 
 USTRUCT(BlueprintType)
@@ -71,63 +110,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient State")
 	ESauceType SauceType;
 
-	//Cooking Times
-	
-	/** How long it takes to cook */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	double CookTime;
-
-	/** How long before it starts burning */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	double CookedTime;
-
-	/** How long it takes to burn */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	double BurnTime;
-
-	//Frying Times
-
-	/** How long it takes to fry */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	double FryTime;
-
-	/** How long before it starts burning */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	double FriedTime;
-
-	/** How long it takes to over fry */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	double OverFryTime;
-
-	/** The ID of the ingredient */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient Config")
-	FString IngredientID;
-
-	/** How long it takes to burn */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Ingredient Config")
-	bool PreciseCooking;
-
-	//Colors
-
-	/** How long it takes to cook */
-	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
-	FLinearColor RawColor;
-
-	/** How long before it starts burning */
-	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
-	FLinearColor CookColor;
-
-	/** How long it takes to burn */
-	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
-	FLinearColor BurnColor;
-
-	/** How long before it starts burning */
-	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
-	FLinearColor FryColor;
-
-	/** How long it takes to burn */
-	UPROPERTY(EditDefaultsOnly, Category = "Ingredient Color Config")
-	FLinearColor OverFryColor;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Ingredient State")
+	TObjectPtr<UIngredientDataAsset> Data;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -136,6 +120,6 @@ public:
 	FIngredientStatus GetStatus() const;
 
 	UFUNCTION(BlueprintCallable, Category = Recipe)
-	FString GetPhase() const;
+	FFullCookPhase GetPhase() const;
 
 };
