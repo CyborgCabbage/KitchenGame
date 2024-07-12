@@ -9,7 +9,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 
-UPlayerGrabber::UPlayerGrabber() : AttachedToHand(false), DropDistance(100), GrabDistance(120), TraceDistance(150), TraceRadius(5) {
+UPlayerGrabber::UPlayerGrabber() : 
+	AttachedToHand(false), 
+	OverLockPoint(false), 
+	DropDistance(100), 
+	GrabDistance(120), 
+	TraceDistance(150), 
+	TraceRadius(5) 
+{
 	GrabberOwner = EGrabberOwner::PLAYER;
 }
 
@@ -178,5 +185,5 @@ void UPlayerGrabber::TryDropToLockPoint()
 }
 
 bool UPlayerGrabber::IsOverLockPoint() {
-	return OverLockPoint;
+	return OverLockPoint && IsValid(Grabbed);
 }
