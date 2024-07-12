@@ -66,7 +66,7 @@ public:
 	FText Name;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TObjectPtr<UUserWidget> Widget;
+	TSubclassOf<UUserWidget> Widget;
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     float Time;
