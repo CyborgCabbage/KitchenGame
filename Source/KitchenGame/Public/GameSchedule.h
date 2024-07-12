@@ -21,6 +21,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	ESauceType ModifierSauceType;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool Tutorial;
 };
 
 /**
@@ -32,9 +35,6 @@ struct FGameSchedule
 	GENERATED_USTRUCT_BODY()
 public:
 	FGameSchedule();
-
-	UPROPERTY(BlueprintReadWrite)
-	bool Tutorial;
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FConfiguredRecipe> Recipes;

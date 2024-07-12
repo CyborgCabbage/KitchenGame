@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "IngredientDataAsset.h"
 #include "AIngredient.generated.h"
+
+class UIngredientDataAsset;
 
 UENUM(BlueprintType)
 enum class ESauceType : uint8
@@ -42,7 +43,7 @@ struct FFullCookPhase
 {
 	GENERATED_USTRUCT_BODY()
 
-	FFullCookPhase(EPrimaryCookPhase Primary = EPrimaryCookPhase::Raw, ESecondaryCookPhase Secondary = ESecondaryCookPhase::Other);
+	FFullCookPhase(EPrimaryCookPhase Primary = EPrimaryCookPhase::Raw, ESecondaryCookPhase Secondary = ESecondaryCookPhase::None);
 
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

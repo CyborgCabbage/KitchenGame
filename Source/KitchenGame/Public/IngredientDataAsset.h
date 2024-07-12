@@ -26,7 +26,7 @@ public:
 
 	/** The blueprint for the ingredient */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TObjectPtr<AIngredient> Ingredient;
+	TSubclassOf<AIngredient> Ingredient;
 
 	/** The Sprite used in some UI */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

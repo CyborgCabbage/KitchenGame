@@ -5,31 +5,55 @@
 
 URecipeDataAsset::URecipeDataAsset() :
 	Name(),
+	Time(60.0f),
 	Widget(nullptr)
 {
 }
 
-TArray<FScorePart> URecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented)
+bool URecipeDataAsset::CanSubmitStack(const TArray<AActor*>& presented)
+{
+	return false;
+}
+
+TArray<FScorePart> URecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType)
 {
 	return TArray<FScorePart>();
 }
 
 UStackRecipeDataAsset::UStackRecipeDataAsset() : URecipeDataAsset(),
-SauceModifierTargetIndex(-1),
-CookPhaseModifierTargetIndex(-1)
+	Sauce(ESauceType::None),
+	SecondaryCookPhase(ESecondaryCookPhase::None)
 {
 }
 
-TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented)
+bool UStackRecipeDataAsset::CanSubmitStack(const TArray<AActor*>& presented)
 {
-	return TArray<FScorePart>();
+	return true;
+}
+
+TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType)
+{
+	TArray<FScorePart> Parts;
+	Parts.Add({ 100, FText::FromString("Test 1") });
+	Parts.Add({ 100, FText::FromString("Test 2") });
+	Parts.Add({ 100, FText::FromString("Test 3") });
+	return Parts;
 }
 
 UDrinkRecipeDataAsset::UDrinkRecipeDataAsset()
 {
 }
 
-TArray<FScorePart> UDrinkRecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented)
+bool UDrinkRecipeDataAsset::CanSubmitStack(const TArray<AActor*>& presented)
 {
-	return TArray<FScorePart>();
+	return true;
+}
+
+TArray<FScorePart> UDrinkRecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType)
+{
+	TArray<FScorePart> Parts;
+	Parts.Add({ 100, FText::FromString("Test 1") });
+	Parts.Add({ 100, FText::FromString("Test 2") });
+	Parts.Add({ 100, FText::FromString("Test 3") });
+	return Parts;
 }

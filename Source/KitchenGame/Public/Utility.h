@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "AIngredient.h"
 #include "Utility.generated.h"
 /**
  * 
@@ -33,4 +34,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static void GetActorAndAttached(TArray<AActor*>& OutActors, AActor* Actor);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static ESecondaryCookPhase GetRandomCookPhase();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static ESauceType GetRandomSauceType();
 };

@@ -3,12 +3,14 @@
 
 #include "GameSchedule.h"
 
-FGameSchedule::FGameSchedule() : Tutorial(false)
+FGameSchedule::FGameSchedule()
 {
 }
 
 FConfiguredRecipe::FConfiguredRecipe() :
-	ModifierCookPhase((ESecondaryCookPhase)FMath::RandRange(1, 3)),
-	ModifierSauceType((ESauceType)FMath::RandRange(1, 3))
+	RecipeAsset(nullptr),
+	ModifierCookPhase(ESecondaryCookPhase::None),
+	ModifierSauceType(ESauceType::None),
+	Tutorial(false)
 {
 }

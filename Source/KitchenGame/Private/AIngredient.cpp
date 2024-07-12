@@ -2,6 +2,7 @@
 
 #include "AIngredient.h"
 #include "Math/UnrealMathUtility.h"
+#include "IngredientDataAsset.h"
 
 // Sets default values
 AIngredient::AIngredient() :

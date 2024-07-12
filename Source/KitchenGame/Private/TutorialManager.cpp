@@ -121,12 +121,12 @@ TArray<AActor*> ATutorialManager::GetGrabbingClass(TSubclassOf<AActor> ActorClas
 	return { Grabber->GetGrabbed()->GetOwner() };
 }
 
-TArray<AActor*> ATutorialManager::FilterPhase(const TArray<AActor*>& Actors, FString Phase)
+TArray<AActor*> ATutorialManager::FilterPhase(const TArray<AActor*>& Actors, EPrimaryCookPhase Phase)
 {
 	TArray<AActor*> Result;
 	for (AActor* Actor : Actors) {
 		auto* Ingredient = Cast<AIngredient>(Actor);
-		if (Ingredient && Ingredient->GetPhase() == Phase) {
+		if (Ingredient && Ingredient->GetPhase().Primary == Phase) {
 			Result.Add(Actor);
 		}
 	}

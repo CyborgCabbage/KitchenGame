@@ -9,6 +9,14 @@
 #include "AIngredient.h"
 #include "RecipeDataAsset.generated.h"
 
+UENUM(BlueprintType)
+enum class EStackRecipePosition : uint8
+{
+    Any,
+    Top,
+    Bottom
+};
+
 USTRUCT(BlueprintType)
 struct FScorePart
 {
@@ -29,6 +37,20 @@ public:
     FText Reason;
 };
 
+USTRUCT(BlueprintType)
+struct FRecipeScore
+{
+    GENERATED_USTRUCT_BODY()
+public:
+    /**  */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TObjectPtr<URecipeDataAsset> Recipe;
+
+    /** */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<FScorePart> Parts;
+};
+
 /**
  * 
  */
@@ -46,17 +68,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<UUserWidget> Widget;
 
-    UFUNCTION(BlueprintCallable)
-    virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented);
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+    float Time;
 
-};
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    virtual bool CanSubmitStack(const TArray<AActor*>& presented);
 
-UENUM(BlueprintType)
-enum class EStackRecipePosition : uint8
-{
-    Any,
-    Top,
-    Bottom
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType);
+
 };
 
 USTRUCT(BlueprintType)
@@ -93,15 +113,17 @@ public:
     UStackRecipeDataAsset();
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-    int SauceModifierTargetIndex;
+    ESauceType Sauce;
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-    int CookPhaseModifierTargetIndex;
+    ESecondaryCookPhase SecondaryCookPhase;
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     TArray<FRecipeItem> Items;
 
-    virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented) override;
+    virtual bool CanSubmitStack(const TArray<AActor*>& presented) override;
+
+    virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType) override;
 
 };
 
@@ -116,8 +138,10 @@ public:
     UDrinkRecipeDataAsset();
 
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-    TArray<AActor> Items;
+    TArray<TObjectPtr<UIngredientDataAsset>> Ingredients;
 
-    virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented) override;
+    virtual bool CanSubmitStack(const TArray<AActor*>& presented) override;
+
+    virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType) override;
 
 };
