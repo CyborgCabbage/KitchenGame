@@ -125,4 +125,22 @@ ESauceType UUtility::GetRandomSauceType()
 	return (ESauceType)FMath::RandRange(1, 3);
 }
 
+int UUtility::SumScoreParts(TArray<FScorePart> Parts)
+{
+	int Total = 0;
+	for (const FScorePart& Part : Parts) {
+		Total += Part.Value;
+	}
+	return Total;
+}
+
+int UUtility::SumRecipeScore(TArray<FRecipeScore> Parts)
+{
+	int Total = 0;
+	for (const FRecipeScore& Part : Parts) {
+		Total += SumScoreParts(Part.Parts);
+	}
+	return Total;
+}
+
 

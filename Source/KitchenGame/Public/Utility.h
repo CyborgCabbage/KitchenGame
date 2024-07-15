@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "AIngredient.h"
+#include "RecipeDataAsset.h"
 #include "Utility.generated.h"
 /**
  * 
@@ -40,4 +41,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static ESauceType GetRandomSauceType();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static int SumScoreParts(TArray<FScorePart> Parts);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static int SumRecipeScore(TArray<FRecipeScore> Parts);
 };
