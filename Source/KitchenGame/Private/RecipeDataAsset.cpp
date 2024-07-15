@@ -132,7 +132,7 @@ TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*
 	}
 	// PresentedIngredients no contains items that were presented but don't correspond to anything in the recipe.
 	for(AIngredient* Remaining : PresentedIngredients) {
-		Parts.Add({ ScoreExtraItem, FText::Format(FText::FromString("Extra {}"), Remaining->Data->Name) });
+		Parts.Add({ ScoreExtraItem, FText::Format(FText::FromString("Extra {0}"), Remaining->Data->Name) });
 	}
 	// MatchedPresented contains presented items that could be matched up to something in the recipe
 	int PreviousIndex = -1;
