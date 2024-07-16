@@ -27,16 +27,8 @@ ATutorialManager::ATutorialManager() : HasResetUI(false)
 	PrimaryActorTick.bCanEverTick = true;
 	IsActive = false;
 	CurrentStep = 0;
-	CurrentInstruction.FromString("");
+	PreviousStep = -1;
 	Highlighted = nullptr;
-}
-
-void ATutorialManager::SetInstruction(const FText& Text)
-{
-	if (!CurrentInstruction.EqualTo(Text)) {
-		OnInstructionChange(Text);
-		CurrentInstruction = Text;
-	}
 }
 
 // Called when the game starts or when spawned
@@ -54,7 +46,6 @@ void ATutorialManager::Tick(float DeltaTime)
 	//
 	if (!IsActive) {
 		if(!HasResetUI) {
-			SetInstruction({});
 			OnHighlightChange(Highlighted);
 			HasResetUI = true;
 		}
@@ -76,10 +67,12 @@ void ATutorialManager::Tick(float DeltaTime)
 		}
 		CurrentStep++;
 	}
+	if(CurrentStep != PreviousStep) {
+		Steps[CurrentStep]->Begin.Broadcast();
+		PreviousStep = CurrentStep;
+	}
 	//Tick step
 	Steps[CurrentStep]->Tick.Broadcast();
-	//Instruction
-	SetInstruction(Steps[CurrentStep]->Instruction);
 	//Highlight
 	OnHighlightChange(Highlighted);
 }
@@ -192,18 +185,12 @@ AActor* ATutorialManager::GetNearestActor(TArray<AActor*> Actors)
 	return MinActor;
 }
 
-FText ATutorialManager::GetCurrentInstruction()
-{
-	return CurrentInstruction;
-}
-
-UTutorialStep* UTutorialStep::TutorialStep(ATutorialManager* TutorialManager, FText Instruction, bool Essential, bool Remember)
+UTutorialStep* UTutorialStep::TutorialStep(ATutorialManager* TutorialManager, bool Essential, bool Remember)
 {
 	UTutorialStep* Node = NewObject<UTutorialStep>();
 	if (Node)
 	{
 		Node->TutorialManager = TutorialManager;
-		Node->Instruction = Instruction;
 		Node->Essential = Essential;
 		Node->Remember = Remember;
 	}
