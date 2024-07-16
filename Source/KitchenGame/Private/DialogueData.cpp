@@ -3,15 +3,16 @@
 
 #include "DialogueData.h"
 
-FDialogueData::FDialogueData() : FDialogueData(FText{}, 0.0f, true, false, nullptr)
+FDialogueData::FDialogueData() : FDialogueData(FText{}, 0.0f, true, false, nullptr, false)
 {
 }
 
-FDialogueData::FDialogueData(FText Text, float WaitTime, bool LockPlayer, bool AutoAdvance, TObjectPtr<AActor> Target) :
+FDialogueData::FDialogueData(FText Text, float WaitTime, bool LockPlayer, bool AutoAdvance, TObjectPtr<AActor> Target, bool Override) :
 	Text(Text),
 	WaitTime(WaitTime),
 	LockPlayer(LockPlayer),
 	AutoAdvance(AutoAdvance),
-	Target(Target)
+	Target(Target),
+	Override(Override)
 {
 }
