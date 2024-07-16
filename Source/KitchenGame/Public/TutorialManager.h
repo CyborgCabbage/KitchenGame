@@ -25,11 +25,13 @@ class UTutorialStep : public UBlueprintAsyncActionBase
 
 private:
 	ATutorialManager* TutorialManager;
-	FText Instruction;
 	bool Essential;
 	bool Remember;
 	bool Passed;
 public:
+
+	UPROPERTY(BlueprintAssignable)
+	FTutorialExecPinSignature Begin;
 
 	UPROPERTY(BlueprintAssignable)
 	FTutorialExecPinSignature Tick;
@@ -38,7 +40,7 @@ public:
 	FTutorialExecPinSignature Check;
 
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true"))
-	static UTutorialStep* TutorialStep(ATutorialManager* TutorialManager, FText Instruction, bool Essential, bool Remember);
+	static UTutorialStep* TutorialStep(ATutorialManager* TutorialManager, bool Essential, bool Remember);
 
 	virtual void Activate() override;
 
@@ -56,9 +58,8 @@ public:
 private:
 	TArray<TObjectPtr<UTutorialStep>> Steps;
 	AActor* Highlighted;
-	FText CurrentInstruction;
 	int CurrentStep;
-	void SetInstruction(const FText& Text);
+	int PreviousStep;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -100,13 +101,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AActor* GetNearestActor(TArray<AActor*> Actors);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FText GetCurrentInstruction();
-
-	// Create Event
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnInstructionChange(const FText& NewInstruction);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHighlightChange(const AActor* NewHighlight);
