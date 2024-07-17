@@ -122,4 +122,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Recipe)
 	FFullCookPhase GetPhase() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void RefreshMaterial();
+
 };

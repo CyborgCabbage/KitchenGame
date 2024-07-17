@@ -7,8 +7,8 @@
 #include "IngredientDataAsset.generated.h"
 
 class AIngredient;
+enum class ESauceType : uint8;
 class UPaperSprite;
-
 /**
  * 
  */
@@ -34,6 +34,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FLinearColor Color;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	ESauceType SauceOutput;
 
 	//Cooking Times
 

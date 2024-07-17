@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsOverLockPoint();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanOutputSauce(ULockPoint* Target);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DropDistance;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -5,8 +5,8 @@
 
 URecipeDataAsset::URecipeDataAsset() :
 	Name(),
-	Time(60.0f),
-	Widget(nullptr)
+	Widget(nullptr),
+	Time(60.0f)
 {
 }
 

@@ -2,12 +2,14 @@
 
 
 #include "IngredientDataAsset.h"
+#include "AIngredient.h"
 
 UIngredientDataAsset::UIngredientDataAsset() :
 	Name(),
 	Ingredient(nullptr),
 	Sprite(nullptr),
 	Color(1.0f, 1.0f, 1.0f),
+	SauceOutput(ESauceType::None),
 	CookTime(10),
 	CookedTime(10),
 	BurnTime(10),

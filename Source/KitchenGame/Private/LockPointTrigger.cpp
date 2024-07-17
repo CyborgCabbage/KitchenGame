@@ -26,10 +26,12 @@ void ALockPointTrigger::Tick(float DeltaTime)
 	if(VisibilityTimer < 0.0f) {
 		VisibilityTimer = 0.0f;
 	}
-	Visual->SetVisibility(VisibilityTimer > 0);
+	Splat->SetVisibility(IsSplat && VisibilityTimer > 0);
+	Visual->SetVisibility(!IsSplat && VisibilityTimer > 0);
 }
 
-void ALockPointTrigger::SetEnableVisual() {
+void ALockPointTrigger::SetEnableVisual(bool IsSauce) {
 	VisibilityTimer = 0.2f;
+	IsSplat = IsSauce;
 }
 

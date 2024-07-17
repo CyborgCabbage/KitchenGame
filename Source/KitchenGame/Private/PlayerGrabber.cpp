@@ -158,7 +158,7 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	FTransform Target{ FRotator{ 0, View->GetComponentRotation().Yaw, 0 }, Begin + Direction * GrabDistance};
 	//Update visual
 	if(auto* LockPointTrigger = GetTargetLockPoint()) {
-		LockPointTrigger->SetEnableVisual();
+		LockPointTrigger->SetEnableVisual(CanOutputSauce(LockPointTrigger->ParentLockPoint));
 		Target = LockPointTrigger->ParentLockPoint->GetLockItemTransform(Grabbed);
 		float Sinus = (sinf(UGameplayStatics::GetRealTimeSeconds(this) * 2 * PI / 1.5f) + 2.0f) * 1.5f;
 		Target.AddToTranslation(LockPointTrigger->GetActorUpVector().GetUnsafeNormal() * Sinus);
@@ -177,13 +177,37 @@ void UPlayerGrabber::TryDropToLockPoint()
 {
 	if (!IsValid(Grabbed)) return;
 	ALockPointTrigger* LockPointTrigger = GetTargetLockPoint();
+	bool IsSauce = LockPointTrigger ? CanOutputSauce(LockPointTrigger->ParentLockPoint) : false;
 	UGrabbable* Grabbable = Grabbed;
 	TryDrop();
 	if (LockPointTrigger) {
-		LockPointTrigger->ParentLockPoint->LockItem(Grabbable);
+		if (IsSauce) {
+			auto* ToSauce = Cast<AIngredient>(LockPointTrigger->ParentLockPoint->GetOwner());
+			auto* Saucer = Cast<AIngredient>(Grabbable->GetOwner());
+			ToSauce->SauceType = Saucer->Data->SauceOutput;
+			ToSauce->RefreshMaterial();
+			Saucer->Destroy();
+		}
+		else {
+			LockPointTrigger->ParentLockPoint->LockItem(Grabbable);
+		}
 	}
 }
 
 bool UPlayerGrabber::IsOverLockPoint() {
 	return OverLockPoint && IsValid(Grabbed);
+}
+
+bool UPlayerGrabber::CanOutputSauce(ULockPoint* Target)
+{
+	if (!IsGrabbing()) return false;
+	auto* Ingredient = Cast<AIngredient>(Grabbed->GetOwner());
+	if (!Ingredient) return false;
+	ESauceType SauceOutput = Ingredient->Data->SauceOutput;
+	if (SauceOutput == ESauceType::None) return false;
+	auto* IngredientTarget = Cast<AIngredient>(Target->GetOwner());
+	if (!IngredientTarget) return false;
+	ESauceType SauceTarget = IngredientTarget->SauceType;
+	if (SauceTarget != ESauceType::None) return false;
+	return true;
 }
