@@ -26,7 +26,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetEnableVisual();
+	void SetEnableVisual(bool IsSauce);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	TObjectPtr<UPrimitiveComponent> Trigger;
@@ -38,6 +38,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	TObjectPtr<UPrimitiveComponent> Visual;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
+	TObjectPtr<UPrimitiveComponent> Splat;
+
 private:
 	float VisibilityTimer;
+	bool IsSplat;
 };
