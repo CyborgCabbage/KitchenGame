@@ -71,6 +71,10 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     float Time;
 
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+    int IngredientCount;
+
+
     UFUNCTION(BlueprintCallable, BlueprintPure)
     virtual bool CanSubmitStack(const TArray<AActor*>& presented);
 

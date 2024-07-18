@@ -6,7 +6,8 @@
 URecipeDataAsset::URecipeDataAsset() :
 	Name(),
 	Widget(nullptr),
-	Time(60.0f)
+	Time(60.0f),
+	IngredientCount(1)
 {
 }
 
