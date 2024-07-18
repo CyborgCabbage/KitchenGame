@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Grabber.h"
+#include "LockPoint.h"
 #include "PlayerGrabber.generated.h"
 
 class ALockPointTrigger;
@@ -27,11 +28,10 @@ private:
 	bool AttachedToHand;
 
 	ALockPointTrigger* TraceLockPoint();
-	ALockPointTrigger* OverlapLockPoint();
 
-	ALockPointTrigger* GetTargetLockPoint();
-
-	bool OverLockPoint;
+	void UpdateCurrentLockPoint();
+	TObjectPtr<ULockPoint> CurrentLockPoint;
+	bool IsSplat;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -41,9 +41,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsOverLockPoint();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool CanOutputSauce(ULockPoint* Target);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DropDistance;
