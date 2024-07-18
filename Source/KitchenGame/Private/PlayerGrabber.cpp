@@ -8,14 +8,13 @@
 #include "Engine/SkeletalMesh.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
-
 UPlayerGrabber::UPlayerGrabber() : 
-	AttachedToHand(false), 
-	OverLockPoint(false), 
+	AttachedToHand(false),
+	IsSplat(false),
 	DropDistance(100), 
 	GrabDistance(120), 
 	TraceDistance(150), 
-	TraceRadius(5) 
+	TraceRadius(5)
 {
 	GrabberOwner = EGrabberOwner::PLAYER;
 }
@@ -39,14 +38,6 @@ bool UPlayerGrabber::FinishPickup() {
 		Grabbed->GrabTarget->SetWorldTransform(UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetSocketTransform("Grab"), Hand->GetComponentTransform(), false));
 		Grabbed->SetEnablePhysics(false, false);
 		Grabbed->GetOwner()->AttachToComponent(Hand, {EAttachmentRule::KeepWorld, true});
-		/*Grabbed->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
-		Grabbed->GetOwner()->SetActorRelativeRotation(FQuat::Identity);
-		FTransform SocketTransform = Grabbed->GrabTarget->GetSocketTransform("Grab").GetRelativeTransform(Hand->GetComponentTransform());
-		SocketTransform.SetScale3D(FVector::OneVector);
-		SocketTransform = SocketTransform.Inverse();
-		Grabbed->GetOwner()->SetActorRelativeLocation(SocketTransform.GetLocation());
-		Grabbed->GetOwner()->SetActorRelativeRotation(SocketTransform.GetRotation());*/
-		//UUtility::MoveToTransform(Grabbed->GrabTarget, Grabbed->GrabPoint, Hand, false);
 		AttachedToHand = true;
 		return true;
 	}
@@ -56,6 +47,11 @@ bool UPlayerGrabber::FinishPickup() {
 }
 
 void UPlayerGrabber::FinishDrop() {
+	if (CurrentLockPoint) {
+		Grabbed->OnLockPointEndOverlapDelegate.ExecuteIfBound(CurrentLockPoint);
+		IsSplat = false;
+		CurrentLockPoint = nullptr;
+	}
 	if (AttachedToHand) {
 		Grabbed->SetEnablePhysics(true, true);
 		Grabbed->GetOwner()->DetachFromActor({ EDetachmentRule::KeepWorld, true });
@@ -91,7 +87,7 @@ void UPlayerGrabber::FinishDrop() {
 }
 
 ALockPointTrigger* UPlayerGrabber::TraceLockPoint() {
-	if (!IsValid(Grabbed)) return nullptr;
+	check(IsValid(Grabbed))
 	FVector Begin = View->GetComponentTransform().GetLocation();
 	FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
 	TArray<FHitResult> OutHits;
@@ -113,41 +109,26 @@ ALockPointTrigger* UPlayerGrabber::TraceLockPoint() {
 	return nullptr;
 }
 
-ALockPointTrigger* UPlayerGrabber::OverlapLockPoint() {
-	if (!IsValid(Grabbed)) return nullptr;
-	TArray<AActor*> Overlapping;
-	if (!IsValid(Grabbed->GrabTarget)) return nullptr;
-	Grabbed->GrabTarget->GetOverlappingActors(Overlapping, ALockPointTrigger::StaticClass());
-	float MinDistance = INFINITY;
-	ALockPointTrigger* MinLockPointTrigger = nullptr;
-	for (AActor* Actor : Overlapping) {
-		auto* LockPointTrigger = Cast<ALockPointTrigger>(Actor);
-		if (LockPointTrigger->ParentLockPoint && LockPointTrigger->ParentLockPoint->CanLock(Grabbed)) {
-			FVector LockPointLocation = LockPointTrigger->GetActorLocation();
-			FVector LockPointUp = LockPointTrigger->GetActorUpVector();
-			FVector Point = Grabbed->GrabTarget->GetComponentLocation();
-			float T = -((LockPointLocation - Point) | LockPointUp);
-			if (T < MinDistance) {
-				MinDistance = T;
-				MinLockPointTrigger = LockPointTrigger;
-			}
-		}
+void UPlayerGrabber::UpdateCurrentLockPoint()
+{
+	if(!IsValid(Grabbed)) {
+		//TryDropToLockPoint should set currentlockpoint to null if the item is dropped,
+		//so we don't have do anything here
+		return;
 	}
-	return MinLockPointTrigger;
-}
-
-ALockPointTrigger* UPlayerGrabber::GetTargetLockPoint() {
-	ALockPointTrigger* LockPointTrigger = nullptr;
-	LockPointTrigger = TraceLockPoint();
-	/*if (AttachedToHand) {
-		LockPointTrigger = TraceLockPoint();
-	} else {
-		LockPointTrigger = OverlapLockPoint();
-		if(!LockPointTrigger) {
-			LockPointTrigger = TraceLockPoint();
+	ALockPointTrigger* LPT = TraceLockPoint();
+	ULockPoint* NextLockPoint = LPT ? LPT->ParentLockPoint : nullptr;
+	if (NextLockPoint != CurrentLockPoint) {
+		if(IsValid(CurrentLockPoint)) {
+			Grabbed->OnLockPointEndOverlapDelegate.ExecuteIfBound(CurrentLockPoint);
+			IsSplat = false;
 		}
-	}*/
-	return LockPointTrigger;
+		if (IsValid(NextLockPoint) && Grabbed->OnLockPointBeginOverlapDelegate.IsBound()) {
+			IsSplat = Grabbed->OnLockPointBeginOverlapDelegate.Execute(NextLockPoint);
+		}
+		CurrentLockPoint = NextLockPoint;
+	}
+	return;
 }
 
 void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -156,16 +137,16 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	FVector Begin = View->GetComponentTransform().GetLocation();
 	FVector Direction = View->GetComponentTransform().GetRotation().GetForwardVector();
 	FTransform Target{ FRotator{ 0, View->GetComponentRotation().Yaw, 0 }, Begin + Direction * GrabDistance};
+	UpdateCurrentLockPoint();
 	//Update visual
-	if(auto* LockPointTrigger = GetTargetLockPoint()) {
-		LockPointTrigger->SetEnableVisual(CanOutputSauce(LockPointTrigger->ParentLockPoint));
+	if(CurrentLockPoint) {
+		bool TriggerEnabled = false;
+		ALockPointTrigger* LockPointTrigger = CurrentLockPoint->GetTriggerActor(TriggerEnabled);
+		LockPointTrigger->SetEnableVisual(IsSplat);
 		Target = LockPointTrigger->ParentLockPoint->GetLockItemTransform(Grabbed);
 		float Sinus = (sinf(UGameplayStatics::GetRealTimeSeconds(this) * 2 * PI / 1.5f) + 2.0f) * 1.5f;
 		Target.AddToTranslation(LockPointTrigger->GetActorUpVector().GetUnsafeNormal() * Sinus);
 		Target.SetTranslation(FMath::Lerp(Target.GetTranslation(), Begin + Direction * GrabDistance, 0.2f));
-		OverLockPoint = true;
-	}else{
-		OverLockPoint = false;
 	}
 	//Move grabbed to location
 	if (IsValid(Grabbed) && !AttachedToHand) {
@@ -176,38 +157,14 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 void UPlayerGrabber::TryDropToLockPoint()
 {
 	if (!IsValid(Grabbed)) return;
-	ALockPointTrigger* LockPointTrigger = GetTargetLockPoint();
-	bool IsSauce = LockPointTrigger ? CanOutputSauce(LockPointTrigger->ParentLockPoint) : false;
+	ULockPoint* CurrentLockPointTemp = CurrentLockPoint;
 	UGrabbable* Grabbable = Grabbed;
 	TryDrop();
-	if (LockPointTrigger) {
-		if (IsSauce) {
-			auto* ToSauce = Cast<AIngredient>(LockPointTrigger->ParentLockPoint->GetOwner());
-			auto* Saucer = Cast<AIngredient>(Grabbable->GetOwner());
-			ToSauce->SauceType = Saucer->Data->SauceOutput;
-			ToSauce->RefreshMaterial();
-			Saucer->Destroy();
-		}
-		else {
-			LockPointTrigger->ParentLockPoint->LockItem(Grabbable);
-		}
+	if (CurrentLockPointTemp) {
+		CurrentLockPointTemp->LockItem(Grabbable);
 	}
 }
 
 bool UPlayerGrabber::IsOverLockPoint() {
-	return OverLockPoint && IsValid(Grabbed);
-}
-
-bool UPlayerGrabber::CanOutputSauce(ULockPoint* Target)
-{
-	if (!IsGrabbing()) return false;
-	auto* Ingredient = Cast<AIngredient>(Grabbed->GetOwner());
-	if (!Ingredient) return false;
-	ESauceType SauceOutput = Ingredient->Data->SauceOutput;
-	if (SauceOutput == ESauceType::None) return false;
-	auto* IngredientTarget = Cast<AIngredient>(Target->GetOwner());
-	if (!IngredientTarget) return false;
-	ESauceType SauceTarget = IngredientTarget->SauceType;
-	if (SauceTarget != ESauceType::None) return false;
-	return true;
+	return IsValid(CurrentLockPoint) && IsValid(Grabbed);
 }
