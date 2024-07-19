@@ -12,8 +12,7 @@ class ATutorialManager;
 /**
  * Signatures of execution pins in the editor
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTutorialExecPinSignature);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTutorialExecPinSignature, float, TimeInStep);
 /**
  *
  */
@@ -44,7 +43,7 @@ public:
 
 	virtual void Activate() override;
 
-	bool IsPassed();
+	bool IsPassed(float TimeInStep);
 };
 
 UCLASS(Blueprintable, Abstract)
@@ -60,6 +59,7 @@ private:
 	AActor* Highlighted;
 	int CurrentStep;
 	int PreviousStep;
+	float TimeInStep;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

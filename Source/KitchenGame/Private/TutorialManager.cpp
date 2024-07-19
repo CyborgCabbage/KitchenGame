@@ -10,13 +10,13 @@ void UTutorialStep::Activate()
 	TutorialManager->AddTutorialStep(this);
 }
 
-bool UTutorialStep::IsPassed()
+bool UTutorialStep::IsPassed(float TimeInStep)
 {
 	if (Remember && Passed) {
 		return true;
 	}
 	Passed = false;
-	Check.Broadcast();
+	Check.Broadcast(TimeInStep);
 	return Passed;
 }
 
@@ -29,6 +29,7 @@ ATutorialManager::ATutorialManager() : HasResetUI(false)
 	CurrentStep = 0;
 	PreviousStep = -1;
 	Highlighted = nullptr;
+	TimeInStep = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -55,24 +56,26 @@ void ATutorialManager::Tick(float DeltaTime)
 	}
 	//Select current step
 	for (CurrentStep = 0; CurrentStep < Steps.Num(); CurrentStep++) {
-		if (Steps[CurrentStep]->Essential && !Steps[CurrentStep]->IsPassed()) {
+		if (Steps[CurrentStep]->Essential && !Steps[CurrentStep]->IsPassed(CurrentStep == PreviousStep ? TimeInStep : 0.0f)) {
 			break;
 		}
 	}
 	for (; CurrentStep > 0; CurrentStep--) {
 		CurrentStep--;
-		if (Steps[CurrentStep]->IsPassed()) {
+		if (Steps[CurrentStep]->IsPassed(CurrentStep == PreviousStep ? TimeInStep : 0.0f)) {
 			CurrentStep++;
 			break;
 		}
 		CurrentStep++;
 	}
 	if(CurrentStep != PreviousStep) {
-		Steps[CurrentStep]->Begin.Broadcast();
+		TimeInStep = 0.0f;
+		Steps[CurrentStep]->Begin.Broadcast(TimeInStep);
 		PreviousStep = CurrentStep;
 	}
 	//Tick step
-	Steps[CurrentStep]->Tick.Broadcast();
+	Steps[CurrentStep]->Tick.Broadcast(TimeInStep);
+	TimeInStep += DeltaTime;
 	//Highlight
 	OnHighlightChange(Highlighted);
 }
