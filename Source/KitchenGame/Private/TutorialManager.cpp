@@ -70,6 +70,7 @@ void ATutorialManager::Tick(float DeltaTime)
 	}
 	if(CurrentStep != PreviousStep) {
 		TimeInStep = 0.0f;
+		if(PreviousStep > -1) OnStepEnd();
 		Steps[CurrentStep]->Begin.Broadcast(TimeInStep);
 		PreviousStep = CurrentStep;
 	}

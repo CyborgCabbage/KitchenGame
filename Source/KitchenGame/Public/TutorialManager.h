@@ -105,6 +105,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHighlightChange(const AActor* NewHighlight);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStepEnd();
+
 	UPROPERTY(BlueprintReadWrite)
 	bool IsActive;
 };
