@@ -125,6 +125,9 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
     TArray<FRecipeItem> Items;
 
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+    bool RequirePlate;
+
     virtual bool CanSubmitStack(const TArray<AActor*>& presented) override;
 
     virtual TArray<FScorePart> GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType) override;

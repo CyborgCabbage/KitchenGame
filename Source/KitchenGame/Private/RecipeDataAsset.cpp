@@ -23,7 +23,8 @@ TArray<FScorePart> URecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& pr
 
 UStackRecipeDataAsset::UStackRecipeDataAsset() : URecipeDataAsset(),
 	Sauce(ESauceType::None),
-	SecondaryCookPhase(ESecondaryCookPhase::None)
+	SecondaryCookPhase(ESecondaryCookPhase::None),
+	RequirePlate(true)
 {
 }
 
@@ -74,11 +75,13 @@ const int ScoreExtraItem{ -800 };
 const int ScoreOutOfOrder{ -1000 };
 const int ScoreIngredient{ 1000 };
 
-static FText PhaseToText(FFullCookPhase CookPhase) {
-	switch (CookPhase.Secondary) {
-	case ESecondaryCookPhase::Rare: return FText::FromString("Rare");
-	case ESecondaryCookPhase::Medium: return FText::FromString("Medium");
-	case ESecondaryCookPhase::WellDone: return FText::FromString("Well Done");
+static FText PhaseToText(FFullCookPhase CookPhase, bool Precise = false) {
+	if (Precise) {
+		switch (CookPhase.Secondary) {
+		case ESecondaryCookPhase::Rare: return FText::FromString("Rare");
+		case ESecondaryCookPhase::Medium: return FText::FromString("Medium");
+		case ESecondaryCookPhase::WellDone: return FText::FromString("Well Done");
+		}
 	}
 	switch (CookPhase.Primary) {
 	case EPrimaryCookPhase::Raw: return FText::FromString("Raw");
@@ -97,7 +100,7 @@ TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*
 	ESecondaryCookPhase LocalCookPhase = (ModifierCookPhase == ESecondaryCookPhase::None) ? SecondaryCookPhase : ModifierCookPhase;
 	ESauceType LocalSauceType = (ModifierSauceType == ESauceType::None) ? Sauce : ModifierSauceType;
 	TArray<FScorePart> Parts;
-	if (!presented[0]->ActorHasTag("plate")) {
+	if (!presented[0]->ActorHasTag("plate") && RequirePlate) {
 		Parts.Add({ ScoreNoPlate, FText::FromString("No plate") });
 	}
 	//Get ingredients
@@ -161,8 +164,8 @@ TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*
 				Parts.Add({ ScoreWrongPhase, 
 					FText::Format(FText::FromString("{0} should have been {1} not {2}"), 
 						Info.Key.Ref->Data->Name, 
-						PhaseToText(TargetPhase),
-						PhaseToText(Info.Key.Ref->GetPhase())
+						PhaseToText(TargetPhase, Info.Key.Ref->Data->PreciseCooking),
+						PhaseToText(Info.Key.Ref->GetPhase(), Info.Key.Ref->Data->PreciseCooking)
 					) 
 					});
 			}
