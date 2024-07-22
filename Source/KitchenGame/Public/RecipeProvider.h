@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "ChopRecipes.h"
+#include "BlendRecipes.h"
 #include "RecipeProvider.generated.h"
 
 // This class does not need to be modified.
@@ -24,4 +26,7 @@ class KITCHENGAME_API IRecipeProvider
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	UChopRecipes* GetChopRecipes();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UBlendRecipes* GetBlendRecipes();
 };
