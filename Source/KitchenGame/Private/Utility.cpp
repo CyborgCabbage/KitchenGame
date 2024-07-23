@@ -111,6 +111,10 @@ void UUtility::DestroyActorAndAttached(AActor* Actor)
 }
 
 void UUtility::GetActorAndAttached(TArray<AActor*>& OutActors, AActor* Actor) {
+	if (!IsValid(Actor)) {
+		UE_LOG(LogTemp, Warning, TEXT("Parent actor in GetActorAndAttached was invalid."));
+		return;
+	}
 	OutActors.Add(Actor);
 	Actor->GetAttachedActors(OutActors, false, true);
 }
