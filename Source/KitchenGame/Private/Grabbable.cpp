@@ -35,11 +35,6 @@ void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 void UGrabbable::ConfigureGrabbable(UPrimitiveComponent* Physics, bool InHandValue) {
 	InHand = InHandValue;
 	GrabTarget = Physics;
-	Physics->SetSimulatePhysics(true);
-	for(UPrimitiveComponent* pc : TInlineComponentArray<UPrimitiveComponent*>{ Physics->GetOwner() }) {
-		pc->CanCharacterStepUpOn = ECB_No;
-		pc->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	}
 }
 
 void UGrabbable::SetEnablePhysics(bool Simulating, bool Colliding) {
