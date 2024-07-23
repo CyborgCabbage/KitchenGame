@@ -53,7 +53,7 @@ FIngredientStatus AIngredient::GetStatus() const
 		break;
 	case ESauceType::Slime:
 		status.SauceProgress = 1.0f;
-		status.SauceColor = { 0.7f, 1.0f, 0.7f };
+		status.SauceColor = { 0.0f, 1.0f, 0.4f };
 		break;
 	}
 	if (Burnt > 0.0f && Burnt > OverFried) {
