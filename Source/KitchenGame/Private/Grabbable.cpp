@@ -28,8 +28,18 @@ void UGrabbable::BeginPlay()
 void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	
+	float Speed = IsValid(GrabTarget) ? GrabTarget->GetComponentVelocity().Length() : 0.0f;
+	if (!IsGrabbed && !IsLocked) {
+		if (Speed > 5.0f) {
+			AirTime += DeltaTime;
+		}
+		else if (Speed < 0.5f) {
+			AirTime = 0;
+		}
+	}else{
+		AirTime = 0;
+	}
 }
 
 void UGrabbable::ConfigureGrabbable(UPrimitiveComponent* Physics, bool InHandValue) {
@@ -89,5 +99,10 @@ bool UGrabbable::IsOnClass(TSubclassOf<AActor> Class, bool Recursive)
 		}
 	}
 	return false;
+}
+
+float UGrabbable::GetAirTime() const
+{
+	return AirTime;
 }
 
