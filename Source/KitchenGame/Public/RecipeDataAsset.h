@@ -100,10 +100,6 @@ public:
     /**  */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     EStackRecipePosition Position;
-
-    /**  */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    ESauceType Sauce;
 };
 
 /**

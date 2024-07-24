@@ -71,9 +71,11 @@ static MatchStatus MatchItem(AIngredient* Presented, FRecipeItem Requirement, ES
 
 const int ScoreNoPlate{ -500 };
 const int ScoreWrongPhase{ -500 };
-const int ScoreExtraItem{ -800 };
-const int ScoreOutOfOrder{ -1000 };
+const int ScoreExtraItem{ -600 };
+const int ScoreOutOfOrder{ -300 };
 const int ScoreIngredient{ 1000 };
+const int ScoreExtraSauce{ -300 };
+const int ScoreSauce{ 500 };
 
 static FText PhaseToText(FFullCookPhase CookPhase, bool Precise = false) {
 	if (Precise) {
@@ -95,6 +97,15 @@ static FText PhaseToText(FFullCookPhase CookPhase, bool Precise = false) {
 	}
 }
 
+static FText SauceToText(ESauceType Sauce) {
+	switch (Sauce) {
+	case ESauceType::Tomato: return FText::FromString("Tomato");
+	case ESauceType::Hot: return FText::FromString("Hot");
+	case ESauceType::Slime: return FText::FromString("Slime");
+	default: return FText::FromString("None");
+	}
+}
+
 TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*>& presented, ESecondaryCookPhase ModifierCookPhase, ESauceType ModifierSauceType)
 {
 	ESecondaryCookPhase LocalCookPhase = (ModifierCookPhase == ESecondaryCookPhase::None) ? SecondaryCookPhase : ModifierCookPhase;
@@ -110,6 +121,22 @@ TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*
 			PresentedIngredients.Add(ingredient);
 		}
 	}
+	//Sauce
+	bool FoundSauce = (LocalSauceType == ESauceType::None);
+	for (const AIngredient* Ingredient : PresentedIngredients) {
+		if (Ingredient->SauceType != ESauceType::None) {
+			if (!FoundSauce && Ingredient->SauceType == LocalSauceType) {
+				FoundSauce = true;
+				Parts.Add({ ScoreSauce, FText::Format(FText::FromString("{0} Sauce"), SauceToText(Ingredient->SauceType)) });
+			}
+			else {
+				Parts.Add({ ScoreExtraSauce, FText::Format(FText::FromString("Extra {0} Sauce"), SauceToText(Ingredient->SauceType)) });
+			}
+		}
+	}
+	if (!FoundSauce) {
+		Parts.Add({ 0, FText::Format(FText::FromString("{0} Sauce was missing"), SauceToText(LocalSauceType)) });
+	}
 	//Match up
 	struct MatchInfo {
 		AIngredient* Ref;
@@ -124,37 +151,45 @@ TArray<FScorePart> UStackRecipeDataAsset::GetScoreFromStack(const TArray<AActor*
 			TM
 			});
 	}
+	TSet<int> UsedIndices;
 	for (int i = 0; i < Matched.Num(); i++) {
 		for (int j = 0; j < PresentedIngredients.Num(); j++) {
+			if (UsedIndices.Contains(j)) continue;
 			MatchStatus Status = MatchItem(PresentedIngredients[j], Matched[i].Value, LocalCookPhase);
 			if (Status != MatchStatus::WrongItem) {
 				Matched[i].Key = { PresentedIngredients[j], Status, j };
-				PresentedIngredients.RemoveAt(j);
+				UsedIndices.Add(j);
 				break;
 			}
 		}
 	}
 	// PresentedIngredients no contains items that were presented but don't correspond to anything in the recipe.
-	for(AIngredient* Remaining : PresentedIngredients) {
-		Parts.Add({ ScoreExtraItem, FText::Format(FText::FromString("Extra {0}"), Remaining->Data->Name) });
+	for (int j = 0; j < PresentedIngredients.Num(); j++) {
+		if (UsedIndices.Contains(j)) continue;
+		Parts.Add({ ScoreExtraItem, FText::Format(FText::FromString("Extra {0}"), PresentedIngredients[j]->Data->Name)});
 	}
 	// MatchedPresented contains presented items that could be matched up to something in the recipe
-	int PreviousIndex = -1;
 	bool IncorrectOrder = false;
 	for (const TPair<MatchInfo, FRecipeItem>& Info : Matched) {
 		if (Info.Key.Ref) {
-			//Check out of order
-			if (Info.Key.Index < PreviousIndex) {
-				IncorrectOrder = true;
-			}
-			PreviousIndex = Info.Key.Index;
 			//Add score for ingredient
 			Parts.Add({ ScoreIngredient,
 					FText::Format(FText::FromString("{0} was presented"),
 						Info.Key.Ref->Data->Name
 					)
 					});
-
+			if (!IncorrectOrder) {
+				if (Info.Value.Position == EStackRecipePosition::Bottom && Info.Key.Index != 0) {
+					Parts.Add({ ScoreOutOfOrder,
+					FText::FromString("Ingredients were out of order")});
+					IncorrectOrder = true;
+				}
+				if (Info.Value.Position == EStackRecipePosition::Top && Info.Key.Index != PresentedIngredients.Num()-1) {
+					Parts.Add({ ScoreOutOfOrder,
+					FText::FromString("Ingredients were out of order") });
+					IncorrectOrder = true;
+				}
+			}
 			//Deduct as appropriate
 			if (Info.Key.Status == MatchStatus::WrongPhase) {
 				FFullCookPhase TargetPhase = Info.Value.CookPhase;
