@@ -68,6 +68,7 @@ void ATutorialManager::Tick(float DeltaTime)
 		}
 		CurrentStep++;
 	}
+	CurrentStep = FMath::Clamp(CurrentStep, 0, Steps.Num() - 1);
 	if(CurrentStep != PreviousStep) {
 		TimeInStep = 0.0f;
 		if(PreviousStep > -1) OnStepEnd();
