@@ -30,15 +30,27 @@ void UPlayerGrabber::BeginPlay()
 
 bool UPlayerGrabber::FinishPickup() {
 	if (Grabbed->InHand) {
-		//Hand grab
-		if (!IsValid(Hand)) {
-			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Failed to pick up object, could not find Hand"));
-			return false;
+		for (UActorComponent* ActorComponent : GetOwner()->GetComponentsByClass(UGrabberHand::StaticClass())) {
+			UGrabberHand* GrabberHand = Cast<UGrabberHand>(ActorComponent);
+			if (Grabbed->GetOwner()->IsA(GrabberHand->HeldClass)) {
+				Grabbed->GetOwner()->AttachToComponent(GrabberHand, { EAttachmentRule::KeepWorld, true });
+				Grabbed->GetOwner()->SetActorRelativeRotation(FQuat::Identity);
+				Grabbed->GetOwner()->SetActorRelativeLocation(FVector::ZeroVector);
+				Grabbed->SetEnablePhysics(false, false);
+				AttachedToHand = true;
+			}
 		}
-		Grabbed->GrabTarget->SetWorldTransform(UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetSocketTransform("Grab"), Hand->GetComponentTransform(), false));
-		Grabbed->SetEnablePhysics(false, false);
-		Grabbed->GetOwner()->AttachToComponent(Hand, {EAttachmentRule::KeepWorld, true});
-		AttachedToHand = true;
+		if (!AttachedToHand) {
+			//Hand grab
+			if (!IsValid(Hand)) {
+				if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Failed to pick up object, could not find Hand"));
+				return false;
+			}
+			Grabbed->GrabTarget->SetWorldTransform(UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetSocketTransform("Grab"), Hand->GetComponentTransform(), false));
+			Grabbed->SetEnablePhysics(false, false);
+			Grabbed->GetOwner()->AttachToComponent(Hand, { EAttachmentRule::KeepWorld, true });
+			AttachedToHand = true;
+		}
 		return true;
 	}
 	else {
