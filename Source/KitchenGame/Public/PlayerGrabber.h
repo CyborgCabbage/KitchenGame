@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Grabber.h"
 #include "LockPoint.h"
+#include "GrabberHand.h"
 #include "PlayerGrabber.generated.h"
 
 class ALockPointTrigger;
@@ -32,6 +33,8 @@ private:
 	void UpdateCurrentLockPoint();
 	TObjectPtr<ULockPoint> CurrentLockPoint;
 	bool IsSplat;
+
+	TMap<TSubclassOf<AActor>, UGrabberHand*> Hands;
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

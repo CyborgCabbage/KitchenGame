@@ -37,7 +37,14 @@ bool UGrabber::CanPickup(UGrabbable* grabbable)
 	//Duh
 	if (!grabbable->CanGrab) return false;
 	//Both players and imps can pickup locked stuff
-	if(grabbable->IsLocked) return true;
+	if (grabbable->IsLocked) {
+		if (auto* ParentGrabbable = grabbable->LockPoint->GetOwner()->GetComponentByClass<UGrabbable>()) {
+			return CanPickup(ParentGrabbable);
+		}
+		else {
+			return true;
+		}
+	}
 	//If an imp owns it, no one can take it (not even other imps)
 	if (grabbable->IsGrabbed) {
 		if (grabbable->Grabber->GrabberOwner == EGrabberOwner::IMP) {
