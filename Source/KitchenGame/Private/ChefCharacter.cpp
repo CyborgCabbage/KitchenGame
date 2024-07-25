@@ -38,7 +38,10 @@ bool AChefCharacter::CanAttack(const USceneComponent* KickOrigin, FString& Strin
 	}
 	else {
 		//Kick
-		ForceDirection = KickOrigin->GetForwardVector() + FVector{ 0.0f, 0.0f, 0.2f };
+		ForceDirection = KickOrigin->GetForwardVector();
+		ForceDirection.Z = 0.0f;
+		ForceDirection.Normalize();
+		ForceDirection.Z = 0.5f;
 		ForceDirection.Normalize();
 		Branches = EAttackType::Kick;
 		HitActors = TraceAttack(KickOrigin->GetComponentLocation(), KickOrigin->GetComponentLocation() + KickOrigin->GetForwardVector() * KickRange);
