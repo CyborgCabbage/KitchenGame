@@ -25,7 +25,7 @@ public:
     FScorePart() : FScorePart(0, FText::FromString("None"))
     {}
 
-    FScorePart(int Value, const FText& Reason) : Value(Value), Reason(Reason)
+    FScorePart(int Value, const FText& Reason, const FName ConsolidationId = {}) : Value(Value), Reason(Reason), ConsolidationId(ConsolidationId)
     {}
 
     /**  */
@@ -35,6 +35,10 @@ public:
     /** */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FText Reason;
+
+    /**  */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FName ConsolidationId;
 };
 
 USTRUCT(BlueprintType)

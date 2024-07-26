@@ -30,8 +30,9 @@ void UPlayerGrabber::BeginPlay()
 
 bool UPlayerGrabber::FinishPickup() {
 	if (Grabbed->InHand) {
-		for (UActorComponent* ActorComponent : GetOwner()->GetComponentsByClass(UGrabberHand::StaticClass())) {
-			UGrabberHand* GrabberHand = Cast<UGrabberHand>(ActorComponent);
+		TInlineComponentArray<UGrabberHand*> GrabberHands;
+		GetOwner()->GetComponents(GrabberHands);
+		for (UGrabberHand* GrabberHand : GrabberHands) {
 			if (Grabbed->GetOwner()->IsA(GrabberHand->HeldClass)) {
 				Grabbed->GetOwner()->AttachToComponent(GrabberHand, { EAttachmentRule::KeepWorld, true });
 				Grabbed->GetOwner()->SetActorRelativeRotation(FQuat::Identity);
@@ -165,6 +166,11 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	if (IsValid(Grabbed) && !AttachedToHand) {
 		SetTarget(Target.GetLocation(), Target.Rotator());
 	}
+}
+
+TObjectPtr<USceneComponent> UPlayerGrabber::GetView()
+{
+	return View;
 }
 
 void UPlayerGrabber::TryDropToLockPoint()

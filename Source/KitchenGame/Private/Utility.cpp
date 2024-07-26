@@ -147,4 +147,27 @@ int UUtility::SumRecipeScore(TArray<FRecipeScore> Parts)
 	return Total;
 }
 
+TArray<FScorePart> UUtility::ConsolidateRecipeScore(const TArray<FScorePart>& Parts)
+{
+	TArray<FScorePart> ConsolidatedParts;
+	TMap<FName, TTuple<FText, int>> ScoreMap;
+	for (const FScorePart& Part : Parts) {
+		if (Part.ConsolidationId.IsNone()) {
+			ConsolidatedParts.Add(Part);
+		}
+		else {
+			if (auto* Temp = ScoreMap.Find(Part.ConsolidationId)) {
+				Temp->Value += Part.Value;
+			}
+			else {
+				ScoreMap.Add({ Part.ConsolidationId, TTuple<FText, int>{Part.Reason, Part.Value} });
+			}
+		}
+	}
+	for (const auto& Pair : ScoreMap) {
+		ConsolidatedParts.Add(FScorePart{ Pair.Value.Value, Pair.Value.Key });
+	}
+	return ConsolidatedParts;
+}
+
 

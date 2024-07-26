@@ -3,9 +3,15 @@
 
 #include "Grabbable.h"
 #include "LockPointTrigger.h"
+#include "PlayerGrabber.h"
 
 // Sets default values for this component's properties
-UGrabbable::UGrabbable() : CanGrab(true)
+UGrabbable::UGrabbable() : 
+	ReleaseLocation(),
+	ReleaseDirection(FVector::ForwardVector),
+	ReleaseTime(INFINITY),
+	WasGrabbed(false),
+	CanGrab(true)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -29,16 +35,19 @@ void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	float Speed = IsValid(GrabTarget) ? GrabTarget->GetComponentVelocity().Length() : 0.0f;
-	if (!IsGrabbed && !IsLocked) {
-		if (Speed > 5.0f) {
-			AirTime += DeltaTime;
-		}
-		else if (Speed < 0.5f) {
-			AirTime = 0;
-		}
-	}else{
-		AirTime = 0;
+	auto* PlayerGrabber = Cast<UPlayerGrabber>(Grabber);
+	if (IsGrabbed && PlayerGrabber) {
+		ReleaseLocation = PlayerGrabber->GetView()->GetComponentLocation();
+		ReleaseDirection = PlayerGrabber->GetView()->GetComponentRotation().Vector();
+		ReleaseTime = 0.0f;
+		WasGrabbed = true;
+	}
+	else if (IsGrabbed || IsLocked) {
+		ReleaseTime = INFINITY;
+		WasGrabbed = false;
+	} 
+	else if(WasGrabbed) {
+		ReleaseTime += DeltaTime;
 	}
 }
 
@@ -101,8 +110,18 @@ bool UGrabbable::IsOnClass(TSubclassOf<AActor> Class, bool Recursive)
 	return false;
 }
 
-float UGrabbable::GetAirTime() const
+bool UGrabbable::IsValidTrickShot() const
 {
-	return AirTime;
+	if (!WasGrabbed) return false;
+	if (ReleaseTime > 5.0f) return false;
+	if (FVector::DistXY(ReleaseLocation, GrabTarget->GetComponentLocation()) < 400.0f) return false;
+	return true;
+}
+
+bool UGrabbable::IsValidDisposal() const
+{
+	if (!WasGrabbed) return false;
+	if (ReleaseTime > 5.0f) return false;
+	return true;
 }
 

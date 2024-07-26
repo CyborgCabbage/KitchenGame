@@ -47,4 +47,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static int SumRecipeScore(TArray<FRecipeScore> Parts);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static TArray<FScorePart> ConsolidateRecipeScore(const TArray<FScorePart>& Parts);
 };

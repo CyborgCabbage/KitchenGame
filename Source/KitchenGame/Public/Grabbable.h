@@ -25,8 +25,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	float AirTime;
-
+	FVector ReleaseLocation;
+	FVector ReleaseDirection;
+	float ReleaseTime;
+	bool WasGrabbed;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -55,7 +57,10 @@ public:
 	bool IsOnClass(TSubclassOf<AActor> Class, bool Recursive);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	float GetAirTime() const;
+	bool IsValidTrickShot() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsValidDisposal() const;
 
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
