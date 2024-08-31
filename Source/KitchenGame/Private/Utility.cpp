@@ -5,6 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/UserInterfaceSettings.h"
+#include "GameFramework/Character.h"
 
 UUtility::UUtility()
 {
@@ -180,5 +181,21 @@ TArray<FScorePart> UUtility::ConsolidateRecipeScore(const TArray<FScorePart>& Pa
 	}
 	return ConsolidatedParts;
 }
-
+void UUtility::LaunchActor(AActor* Actor, FVector Velocity, bool bAddToCurrent) {
+	bool LaunchedSomething = false;
+	TArray<UPrimitiveComponent*> PrimMeshes;
+	Actor->GetComponents<UPrimitiveComponent>(PrimMeshes);
+	for(UPrimitiveComponent* PrimMesh : PrimMeshes) {
+		if (PrimMesh->IsAnySimulatingPhysics()) {
+			PrimMesh->WakeAllRigidBodies();
+			PrimMesh->SetAllPhysicsLinearVelocity(Velocity, bAddToCurrent);
+			LaunchedSomething = true;
+		}
+	}
+	if (!LaunchedSomething) {
+		if(ACharacter* Character = Cast<ACharacter>(Actor)) {
+			Character->LaunchCharacter(Velocity, !bAddToCurrent, !bAddToCurrent);
+		}
+	}
+}
 

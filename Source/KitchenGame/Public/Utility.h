@@ -50,4 +50,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static TArray<FScorePart> ConsolidateRecipeScore(const TArray<FScorePart>& Parts);
+
+	UFUNCTION(BlueprintCallable)
+	static void LaunchActor(AActor* Actor, FVector Velocity, bool bAddToCurrent);
 };
