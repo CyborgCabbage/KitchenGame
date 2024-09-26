@@ -24,6 +24,7 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	FVector ReleaseLocation;
 	FVector ReleaseDirection;
@@ -44,6 +45,12 @@ public:
 	/** Please add a function description */
 	UFUNCTION(BlueprintCallable)
 	void UnlockIfLocked();
+
+	UFUNCTION(BlueprintCallable)
+	void UngrabIfGrabbed();
+
+	UFUNCTION(BlueprintCallable)
+	void UnlockAndUngrab();
 
 	/** Please add a function description */
 	UFUNCTION(BlueprintCallable)

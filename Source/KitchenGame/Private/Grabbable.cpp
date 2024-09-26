@@ -30,6 +30,12 @@ void UGrabbable::BeginPlay()
 	
 }
 
+void UGrabbable::EndPlay(const EEndPlayReason::Type EndPlayReason) 
+{
+	UnlockAndUngrab();
+	Super::EndPlay(EndPlayReason);
+}
+
 // Called every frame
 void UGrabbable::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -65,6 +71,17 @@ void UGrabbable::UnlockIfLocked() {
 	if(!IsLocked) return;
 	if(!IsValid(LockPoint)) return;
 	LockPoint->UnlockItem();
+}
+
+void UGrabbable::UngrabIfGrabbed() {
+	if(!IsGrabbed) return;
+	if(!IsValid(Grabber)) return;
+	Grabber->TryDrop();
+}
+
+void UGrabbable::UnlockAndUngrab() {
+	UnlockIfLocked();
+	UngrabIfGrabbed();
 }
 
 void UGrabbable::SetEnableCollision(bool Value, bool Recursive) {
