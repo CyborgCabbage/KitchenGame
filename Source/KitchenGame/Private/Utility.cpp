@@ -133,10 +133,18 @@ ESauceType UUtility::GetRandomSauceType()
 int UUtility::SumScoreParts(TArray<FScorePart> Parts)
 {
 	int Total = 0;
+	int PercentageTotal = 0;
 	for (const FScorePart& Part : Parts) {
-		Total += Part.Value;
+		if (Part.IsPercentage)
+		{
+			PercentageTotal += Part.Value;
+		} 
+		else
+		{
+			Total += Part.Value;
+		}
 	}
-	return Total;
+	return Total + Total * (PercentageTotal / 100.0f);
 }
 
 int UUtility::SumRecipeScore(TArray<FRecipeScore> Parts)
