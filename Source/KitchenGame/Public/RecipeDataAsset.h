@@ -25,12 +25,16 @@ public:
     FScorePart() : FScorePart(0, FText::FromString("None"))
     {}
 
-    FScorePart(int Value, const FText& Reason, const FName ConsolidationId = {}) : Value(Value), Reason(Reason), ConsolidationId(ConsolidationId)
+    FScorePart(int Value, const FText& Reason, const FName ConsolidationId = {}) : Value(Value), IsPercentage(false), Reason(Reason), ConsolidationId(ConsolidationId)
     {}
 
     /**  */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int Value;
+
+    /**  */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool IsPercentage;
 
     /** */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
