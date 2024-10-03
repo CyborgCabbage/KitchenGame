@@ -157,7 +157,11 @@ void UPlayerGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		ALockPointTrigger* LockPointTrigger = CurrentLockPoint->GetTriggerActor(TriggerEnabled);
 		LockPointTrigger->SetEnableVisual(IsSplat);
 		//Target = LockPointTrigger->ParentLockPoint->GetLockItemTransform(Grabbed);
-		Target = UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetComponentTransform()/*Grabbed->GrabTarget->GetSocketTransform("Bottom")*/, LockPointTrigger->ParentLockPoint->GetComponentTransform(), false);
+		if (USkeletalMeshComponent* SkelGrabTarget = Cast<USkeletalMeshComponent>(Grabbed->GrabTarget)){
+			Target.SetTranslation(LockPointTrigger->ParentLockPoint->GetComponentLocation() + FVector::UpVector * 40.0f);
+		}else{
+			Target = UUtility::MoveToTransform2(Grabbed->GrabTarget, Grabbed->GrabTarget->GetComponentTransform()/*Grabbed->GrabTarget->GetSocketTransform("Bottom")*/, LockPointTrigger->ParentLockPoint->GetComponentTransform(), false);
+		}
 		float Sinus = (sinf(UGameplayStatics::GetRealTimeSeconds(this) * 2 * PI / 1.5f) + 2.0f) * 1.5f;
 		Target.AddToTranslation(LockPointTrigger->GetActorUpVector().GetUnsafeNormal() * Sinus);
 		Target.SetTranslation(FMath::Lerp(Target.GetTranslation(), Begin + Direction * GrabDistance, 0.2f));

@@ -40,10 +40,9 @@ void UOutlineHighlighterComponent::TickComponent(float DeltaTime, ELevelTick Tic
 void UOutlineHighlighterComponent::SetHighlighted(AActor* NewTarget) {
 	TArray<AActor*> NewTargets;
 	if(IsValid(NewTarget)) {
-		NewTarget->GetAttachedActors(NewTargets, false, true);
-		//Remove all children that are not ingredients 
-		//(this is so that the bell on the presentation table isn't highlighted when the presentation table is)
-		NewTargets.RemoveAll([](AActor* Actor){return !IsValid(Cast<AIngredient>(Actor));});
+		if(!NewTarget->ActorHasTag("DontPropHighlight")) {
+			NewTarget->GetAttachedActors(NewTargets, false, true);
+		}
 		NewTargets.Add(NewTarget);
 	}
 	TArray<AActor*> ToRemove;

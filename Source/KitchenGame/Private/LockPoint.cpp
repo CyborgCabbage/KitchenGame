@@ -106,6 +106,14 @@ void ULockPoint::UnlockItem() {
 }
 
 bool ULockPoint::CanLock(UGrabbable* Grabbable) {
+	//TODO: Slug bodge
+	if (USkeletalMeshComponent* SkelGrabTarget = Cast<USkeletalMeshComponent>(Grabbable->GrabTarget)) {
+		if (AIngredient* Ingredient = Cast<AIngredient>(GetOwner())) {
+			if (Ingredient->SauceType != ESauceType::None) {
+				return false;
+			}
+		}
+	}
 	AActor* actor = Grabbable->GetOwner();
 	for(const UClass* allowedClass : AllowedClasses) {
 		if(actor->IsA(allowedClass)) {
