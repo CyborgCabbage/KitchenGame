@@ -29,13 +29,14 @@ void ULockPoint::BeginPlay()
 
 void ULockPoint::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (EndPlayReason == EEndPlayReason::Destroyed) {
-		if (IsValid(LockedItem)) {
-			LockedItem->SetEnablePhysics(true, true);
-			LockedItem->LockPoint = nullptr;
-			LockedItem->IsLocked = false;
-			LockedItem = nullptr;
-		}
+	if (IsValid(LockedItem)) {
+		LockedItem->SetEnablePhysics(true, true);
+		LockedItem->LockPoint = nullptr;
+		LockedItem->IsLocked = false;
+		LockedItem = nullptr;
+	}
+	if (IsValid(CurrentActor)) {
+		CurrentActor->Destroy();
 	}
 }
 
