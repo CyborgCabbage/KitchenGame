@@ -31,9 +31,9 @@ bool AChefCharacter::CanAttack(const USceneComponent* KickOrigin, FString& Strin
 		//Punch
 		ForceDirection = Camera->GetForwardVector();
 		Branches = EAttackType::Punch;
+		String = "Punch";
 		HitActors = TraceAttack(Camera->GetComponentLocation(), Camera->GetComponentLocation() + Camera->GetForwardVector() * PunchRange);
 		if (HitActors.IsEmpty()) return false;
-		String = "Punch";
 		return true;
 	}
 	else {
@@ -44,9 +44,9 @@ bool AChefCharacter::CanAttack(const USceneComponent* KickOrigin, FString& Strin
 		ForceDirection.Z = 0.5f;
 		ForceDirection.Normalize();
 		Branches = EAttackType::Kick;
+		String = "Kick";
 		HitActors = TraceAttack(KickOrigin->GetComponentLocation(), KickOrigin->GetComponentLocation() + KickOrigin->GetForwardVector() * KickRange);
 		if (HitActors.IsEmpty()) return false;
-		String = "Kick";
 		return true;
 	}
 	return false;
