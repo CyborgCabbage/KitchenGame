@@ -11,7 +11,7 @@ struct KITCHENGAME_API FDialogueData
 	GENERATED_USTRUCT_BODY()
 
 	FDialogueData();
-	FDialogueData(FText Text, float WaitTime, bool LockPlayer, bool AutoAdvance, TObjectPtr<AActor> Target, bool Override);
+	FDialogueData(FText Text, float WaitTime, bool LockPlayer, bool AutoAdvance, TObjectPtr<AActor> Target, bool Override, USoundWave* DialogueSound);
 
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -36,4 +36,8 @@ struct KITCHENGAME_API FDialogueData
 	/**  */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool Override;
+
+	/**  */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundWave* DialogueSound;
 };
