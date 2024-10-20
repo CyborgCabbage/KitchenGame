@@ -72,6 +72,9 @@ void UGrabber::TryPickup(UGrabbable* grabbable)
 		Grabbed->Grabber = nullptr;
 		Grabbed = nullptr;
 	}
+	if (Grabbed) {
+		Grabbed->OnGrabbedDelegate.ExecuteIfBound(Grabbed, this);
+	}
 	if (stolenFrom) {
 		stolenFrom->OnStolenDelegate.ExecuteIfBound(grabbable);
 	}

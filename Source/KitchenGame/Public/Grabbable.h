@@ -11,6 +11,7 @@ class UGrabber;
 
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnLockPointBeginOverlapSignature, ULockPoint*, LockPoint);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnLockPointEndOverlapSignature, ULockPoint*, LockPoint);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGrabbedSignature, UGrabbable*, Grabbable, UGrabber*, Grabber);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class KITCHENGAME_API UGrabbable : public UActorComponent
@@ -102,4 +103,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	FOnLockPointEndOverlapSignature OnLockPointEndOverlapDelegate;
+
+	UPROPERTY(BlueprintReadWrite)
+	FOnGrabbedSignature OnGrabbedDelegate;
 };
