@@ -142,3 +142,13 @@ bool UGrabbable::IsValidDisposal() const
 	return true;
 }
 
+FVector UGrabbable::GetCenterOfMass() const {
+	if (!GrabTarget) {
+		return FVector::ZeroVector;
+	}
+	if (auto* SkelMesh = Cast<USkeletalMeshComponent>(GrabTarget)) {
+		return SkelMesh->GetSkeletalCenterOfMass();
+	}
+	return GrabTarget->GetCenterOfMass();
+}
+

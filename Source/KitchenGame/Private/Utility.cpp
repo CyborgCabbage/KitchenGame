@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/UserInterfaceSettings.h"
 #include "GameFramework/Character.h"
+#include "Grabbable.h"
 
 UUtility::UUtility()
 {
@@ -205,5 +206,83 @@ void UUtility::LaunchActor(AActor* Actor, FVector Velocity, bool bAddToCurrent) 
 			Character->LaunchCharacter(Velocity, !bAddToCurrent, !bAddToCurrent);
 		}
 	}
+}
+
+TMap<ESnapDirection, FSnapMarkerInfo> UUtility::CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*>& ComponentsInRange, const TArray<AActor*>& IgnoreActors, float ScreenBorder) {
+	TSet<AActor*> Actors;
+	for (const auto& Component : ComponentsInRange) {
+		if(IsValid(Component) && IsValid(Component->GetOwner())) {
+			Actors.Add(Component->GetOwner());
+		}
+	}
+	for (AActor* Ignored : IgnoreActors) {
+		Actors.Remove(Ignored);
+	}
+	TMap<ESnapDirection, FSnapMarkerInfo> Chosen;
+	ULocalPlayer* const LP = Player->GetLocalPlayer();
+	if (!LP || !LP->ViewportClient) {
+		return {};
+	}
+	//Viewport Size
+	FVector2D ViewportSize;
+	LP->ViewportClient->GetViewportSize(ViewportSize);
+	FVector2D ViewportCentre = ViewportSize / 2;
+	//Get the projection data
+	FSceneViewProjectionData ProjectionData;
+	if (!LP->GetProjectionData(LP->ViewportClient->Viewport, /*out*/ ProjectionData)) {
+		return {};
+	}
+	FMatrix const ViewProjectionMatrix = ProjectionData.ComputeViewProjectionMatrix();
+	for (AActor* Actor : Actors) {
+		FVector Pos = FVector::ZeroVector;
+		UGrabbable* Grabbable = Actor->GetComponentByClass<UGrabbable>();
+		if (Grabbable) {
+			Pos = Grabbable->GetCenterOfMass();
+		}
+		if (Pos == FVector::ZeroVector) {
+			continue;
+		}
+		FVector2D ScreenPosition = FVector2D::ZeroVector;
+		FSceneView::ProjectWorldToScreen(Pos, ProjectionData.GetConstrainedViewRect(), ViewProjectionMatrix, ScreenPosition);
+		//Relative Viewport
+		ScreenPosition -= FVector2D(ProjectionData.GetConstrainedViewRect().Min);
+		//Custom Post Process
+		Player->PostProcessWorldToScreen(Pos, ScreenPosition, true);
+		//Out of Circle
+		if (!FBox2D(FVector2D::ZeroVector, ViewportSize).ExpandBy(-ViewportCentre.GetMin() * ScreenBorder).IsInside(ScreenPosition)) {
+			continue;
+		}
+		//Get longest axis
+		FVector2D RelativePosition = ScreenPosition - ViewportCentre;
+		ESnapDirection ShortestAxis;
+		float ShortestAxisLength;
+		if (FMath::Abs(RelativePosition.X) > FMath::Abs(RelativePosition.Y)) {
+			ShortestAxisLength = FMath::Abs(RelativePosition.X);
+			if (RelativePosition.X > 0) {
+				ShortestAxis = ESnapDirection::Right;
+			} else {
+				ShortestAxis = ESnapDirection::Left;
+			}
+		} else {
+			ShortestAxisLength = FMath::Abs(RelativePosition.Y);
+			if (RelativePosition.Y > 0) {
+				ShortestAxis = ESnapDirection::Down;
+			} else {
+				ShortestAxis = ESnapDirection::Up;
+			}
+		}
+		auto& Entry = Chosen.FindOrAdd(ShortestAxis);
+		float DistanceToCentre = FVector2D::Distance(ViewportCentre, ScreenPosition);
+		if (DistanceToCentre < Entry.DistanceAlongAxis) {
+			//Adjust to viewport scale
+			float UserResolutionScale = GetDefault<UUserInterfaceSettings>()->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
+			ScreenPosition /= UserResolutionScale;
+			Entry.PositionOnScreen = ScreenPosition;
+			Entry.DistanceAlongAxis = DistanceToCentre;
+			Entry.WorldPosition = Pos;
+			Entry.Grabbable = Grabbable;
+		}
+	}
+	return Chosen;
 }
 

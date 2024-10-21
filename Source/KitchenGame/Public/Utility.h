@@ -7,9 +7,30 @@
 #include "AIngredient.h"
 #include "RecipeDataAsset.h"
 #include "Utility.generated.h"
-/**
- * 
- */
+
+UENUM(BlueprintType)
+enum class ESnapDirection : uint8 {
+	Up,
+	Right,
+	Down,
+	Left
+};
+
+class UGrabbable;
+
+USTRUCT(BlueprintType, Blueprintable)
+struct FSnapMarkerInfo {
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FVector2D PositionOnScreen = FVector2D::ZeroVector;
+	UPROPERTY(BlueprintReadWrite)
+	FVector WorldPosition = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadWrite)
+	UGrabbable* Grabbable = nullptr;
+	float DistanceAlongAxis = INFINITY;
+};
+
 UCLASS()
 class KITCHENGAME_API UUtility : public UBlueprintFunctionLibrary
 {
@@ -53,4 +74,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void LaunchActor(AActor* Actor, FVector Velocity, bool bAddToCurrent);
+
+	UFUNCTION(BlueprintCallable)
+	static TMap<ESnapDirection, FSnapMarkerInfo> CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*> &ComponentsInRange, const TArray<AActor*>& IgnoreActors, float ScreenBorder = 0.1f);
+
 };

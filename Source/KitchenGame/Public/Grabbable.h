@@ -70,6 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsValidDisposal() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetCenterOfMass() const;
+
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	TObjectPtr<UPrimitiveComponent> GrabTarget;
