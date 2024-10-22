@@ -286,3 +286,30 @@ TMap<ESnapDirection, FSnapMarkerInfo> UUtility::CalculateSnapMarkers(APlayerCont
 	return Chosen;
 }
 
+FVector2D UUtility::GetSnapMarkerPositionOnScreen(APlayerController const* Player, const FSnapMarkerInfo& SnapMarkerInfo) {
+	ULocalPlayer* const LP = Player->GetLocalPlayer();
+	if (!LP || !LP->ViewportClient) {
+		return {};
+	}
+	//Viewport Size
+	FVector2D ViewportSize;
+	LP->ViewportClient->GetViewportSize(ViewportSize);
+	FVector2D ViewportCentre = ViewportSize / 2;
+	//Get the projection data
+	FSceneViewProjectionData ProjectionData;
+	if (!LP->GetProjectionData(LP->ViewportClient->Viewport, /*out*/ ProjectionData)) {
+		return {};
+	}
+	FMatrix const ViewProjectionMatrix = ProjectionData.ComputeViewProjectionMatrix();
+	FVector2D ScreenPosition = FVector2D::ZeroVector;
+	FSceneView::ProjectWorldToScreen(SnapMarkerInfo.WorldPosition, ProjectionData.GetConstrainedViewRect(), ViewProjectionMatrix, ScreenPosition);
+	//Relative Viewport
+	ScreenPosition -= FVector2D(ProjectionData.GetConstrainedViewRect().Min);
+	//Custom Post Process
+	Player->PostProcessWorldToScreen(SnapMarkerInfo.WorldPosition, ScreenPosition, true);
+	//Adjust to viewport scale
+	float UserResolutionScale = GetDefault<UUserInterfaceSettings>()->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
+	ScreenPosition /= UserResolutionScale;
+	return ScreenPosition;
+}
+

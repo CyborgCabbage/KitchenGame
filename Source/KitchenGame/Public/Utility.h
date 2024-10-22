@@ -78,4 +78,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static TMap<ESnapDirection, FSnapMarkerInfo> CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*> &ComponentsInRange, const TArray<AActor*>& IgnoreActors, float ScreenBorder = 0.1f);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FVector2D GetSnapMarkerPositionOnScreen(APlayerController const* Player, const FSnapMarkerInfo& SnapMarkerInfo);
+
 };
