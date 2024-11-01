@@ -8,10 +8,11 @@ public class KitchenGame : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "UMG", "OnlineSubsystem" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
+		DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		

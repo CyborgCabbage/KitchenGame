@@ -4,6 +4,8 @@
 #include "ChefCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "OnlineSubsystem.h"
+#include "Interfaces/OnlineExternalUIInterface.h"
 
 // Sets default values
 AChefCharacter::AChefCharacter() : AttackCooldown(0), AttackCooldownTimer(0)
@@ -17,7 +19,29 @@ AChefCharacter::AChefCharacter() : AttackCooldown(0), AttackCooldownTimer(0)
 void AChefCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	IOnlineSubsystem* OSS = IOnlineSubsystem::Get();
+	if (!OSS) {
+		return;	
+	}
+	IOnlineExternalUIPtr ExUI = OSS->GetExternalUIInterface();
+	if (!ExUI) {
+		return;	
+	}
+
+	ExUI->OnExternalUIChangeDelegates.AddUObject(this, &AChefCharacter::OnExternalUIChange);
+}
+
+void AChefCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	Super::EndPlay(EndPlayReason);
+	IOnlineSubsystem* OSS = IOnlineSubsystem::Get();
+	if (!OSS) {
+		return;
+	}
+	IOnlineExternalUIPtr ExUI = OSS->GetExternalUIInterface();
+	if (!ExUI) {
+		return;
+	}
+	ExUI->OnExternalUIChangeDelegates.RemoveAll(this);
 }
 
 bool AChefCharacter::CanAttack(const USceneComponent* KickOrigin, FString& String, TArray<AActor*>& HitActors, FVector& ForceDirection, EAttackType& Branches)
