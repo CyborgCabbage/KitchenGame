@@ -73,6 +73,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetCenterOfMass() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UGrabbable* GetGrabbableBelow() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UGrabbable* GetGrabbableAbove() const;
+
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Default")
 	TObjectPtr<UPrimitiveComponent> GrabTarget;

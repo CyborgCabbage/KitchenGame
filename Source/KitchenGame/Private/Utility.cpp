@@ -208,15 +208,12 @@ void UUtility::LaunchActor(AActor* Actor, FVector Velocity, bool bAddToCurrent) 
 	}
 }
 
-TMap<ESnapDirection, FSnapMarkerInfo> UUtility::CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*>& ComponentsInRange, const TArray<AActor*>& IgnoreActors, float ScreenBorder) {
+TMap<ESnapDirection, FSnapMarkerInfo> UUtility::CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*>& ComponentsInRange, AActor* SelectedActor, float ScreenBorder) {
 	TSet<AActor*> Actors;
 	for (const auto& Component : ComponentsInRange) {
 		if(IsValid(Component) && IsValid(Component->GetOwner())) {
 			Actors.Add(Component->GetOwner());
 		}
-	}
-	for (AActor* Ignored : IgnoreActors) {
-		Actors.Remove(Ignored);
 	}
 	TMap<ESnapDirection, FSnapMarkerInfo> Chosen;
 	ULocalPlayer* const LP = Player->GetLocalPlayer();
@@ -240,6 +237,10 @@ TMap<ESnapDirection, FSnapMarkerInfo> UUtility::CalculateSnapMarkers(APlayerCont
 			Pos = Grabbable->GetCenterOfMass();
 		}
 		if (Pos == FVector::ZeroVector) {
+			continue;
+		}
+		FStackRelation StackRelation = GetStackRelation(SelectedActor, Actor);
+		if (StackRelation.Relation != EStackRelation::None && !StackRelation.Direct) {
 			continue;
 		}
 		FVector2D ScreenPosition = FVector2D::ZeroVector;
@@ -271,8 +272,17 @@ TMap<ESnapDirection, FSnapMarkerInfo> UUtility::CalculateSnapMarkers(APlayerCont
 				ShortestAxis = ESnapDirection::Up;
 			}
 		}
-		auto& Entry = Chosen.FindOrAdd(ShortestAxis);
 		float DistanceToCentre = FVector2D::Distance(ViewportCentre, ScreenPosition);
+		if (StackRelation.Direct) {
+			DistanceToCentre = 0.0f;
+			if (StackRelation.Relation == EStackRelation::Above) {
+				ShortestAxis = ESnapDirection::Up;
+			}
+			if (StackRelation.Relation == EStackRelation::Below) {
+				ShortestAxis = ESnapDirection::Down;
+			}
+		}
+		auto& Entry = Chosen.FindOrAdd(ShortestAxis);
 		if (DistanceToCentre < Entry.DistanceAlongAxis) {
 			//Adjust to viewport scale
 			float UserResolutionScale = GetDefault<UUserInterfaceSettings>()->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
@@ -311,5 +321,63 @@ FVector2D UUtility::GetSnapMarkerPositionOnScreen(APlayerController const* Playe
 	float UserResolutionScale = GetDefault<UUserInterfaceSettings>()->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
 	ScreenPosition /= UserResolutionScale;
 	return ScreenPosition;
+}
+
+TArray<AActor*> UUtility::GetActorsInStack(AActor* Initial) {
+	if (!IsValid(Initial)) {
+		return {};
+	}
+	UGrabbable* Base = Initial->GetComponentByClass<UGrabbable>();
+	if (!Base) {
+		return {};
+	}
+	//Get to the bottom
+	while (true) {
+		UGrabbable* Below = Base->GetGrabbableBelow();
+		if (!Below) {
+			break;
+		}
+		Base = Below;
+	}
+	TArray<AActor*> Result;
+	Result.Reserve(5);
+	//Get to the top
+	while (Base) {
+		Result.Add(Base->GetOwner());
+		Base = Base->GetGrabbableAbove();
+	}
+	return Result;
+}
+
+FStackRelation UUtility::GetStackRelation(AActor* Base, AActor* Other) {
+	FStackRelation Relation;
+	if (Base == Other) {
+		Relation.Relation = EStackRelation::Same;
+		Relation.Direct = false;
+		return Relation;
+	}
+	TArray<AActor*> Stack = GetActorsInStack(Base);
+	if(!Stack.Contains(Other) || Stack.IsEmpty()){
+		Relation.Relation = EStackRelation::None;
+		Relation.Direct = false;
+		return Relation;
+	}
+	//Bottom to top
+	for (int i = 0; i < Stack.Num(); i++) {
+		if(Stack[i] == Other) {
+			Relation.Relation = EStackRelation::Below;
+			Relation.Direct = (Stack[i+1] == Base);
+			return Relation;
+		}
+		if (Stack[i] == Base) {
+			Relation.Relation = EStackRelation::Above;
+			Relation.Direct = (Stack[i + 1] == Other);
+			return Relation;
+		}
+	}
+	checkNoEntry();
+	Relation.Relation = EStackRelation::None;
+	Relation.Direct = false;
+	return Relation;
 }
 

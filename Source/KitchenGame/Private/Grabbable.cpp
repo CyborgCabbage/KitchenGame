@@ -149,6 +149,37 @@ FVector UGrabbable::GetCenterOfMass() const {
 	if (auto* SkelMesh = Cast<USkeletalMeshComponent>(GrabTarget)) {
 		return SkelMesh->GetSkeletalCenterOfMass();
 	}
-	return GrabTarget->GetCenterOfMass();
+	FVector Location = GrabTarget->GetSocketLocation("Grab");
+	if (Location == FVector::ZeroVector) {
+		Location = GrabTarget->GetSocketLocation("Bottom");
+	}
+	if (Location == FVector::ZeroVector) {
+		Location = GrabTarget->GetComponentLocation();
+	}
+	return Location;
+}
+
+UGrabbable* UGrabbable::GetGrabbableBelow() const {
+	if (!IsLocked) {
+		return nullptr;
+	}
+	if (!IsValid(LockPoint)) {
+		return nullptr;
+	}
+	return LockPoint->GetOwner()->GetComponentByClass<UGrabbable>();
+}
+
+UGrabbable* UGrabbable::GetGrabbableAbove() const {
+	ULockPoint* LP = GetOwner()->GetComponentByClass<ULockPoint>();
+	if (!LP) {
+		return nullptr;
+	}
+	if (!LP->InUse) {
+		return nullptr;
+	}
+	if (!IsValid(LP->LockedItem)) {
+		return nullptr;
+	}
+	return LP->LockedItem;
 }
 

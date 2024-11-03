@@ -16,6 +16,23 @@ enum class ESnapDirection : uint8 {
 	Left
 };
 
+UENUM(BlueprintType)
+enum class EStackRelation : uint8 {
+	None,
+	Above,
+	Below,
+	Same
+};
+
+USTRUCT(BlueprintType, Blueprintable)
+struct FStackRelation {
+	GENERATED_USTRUCT_BODY()
+public:
+	EStackRelation Relation = EStackRelation::None;
+	bool Direct = false;
+};
+
+
 class UGrabbable;
 
 USTRUCT(BlueprintType, Blueprintable)
@@ -76,9 +93,15 @@ public:
 	static void LaunchActor(AActor* Actor, FVector Velocity, bool bAddToCurrent);
 
 	UFUNCTION(BlueprintCallable)
-	static TMap<ESnapDirection, FSnapMarkerInfo> CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*> &ComponentsInRange, const TArray<AActor*>& IgnoreActors, float ScreenBorder = 0.1f);
+	static TMap<ESnapDirection, FSnapMarkerInfo> CalculateSnapMarkers(APlayerController const* Player, const TSet<UActorComponent*> &ComponentsInRange, AActor* SelectedActor, float ScreenBorder = 0.1f);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FVector2D GetSnapMarkerPositionOnScreen(APlayerController const* Player, const FSnapMarkerInfo& SnapMarkerInfo);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static TArray<AActor*> GetActorsInStack(AActor* Initial);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static FStackRelation GetStackRelation(AActor* Base, AActor* Other);
 
 };
