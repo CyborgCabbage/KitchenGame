@@ -80,7 +80,7 @@ void AChefCharacter::ResetAttackCooldown()
 {
 	AttackCooldownTimer = AttackCooldown;
 }
-
+/*
 void DrawDebugSweptSphere(const UWorld* InWorld, FVector const& Start, FVector const& End, float Radius, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority)
 {
 	FVector const TraceVec = End - Start;
@@ -120,7 +120,7 @@ void DrawDebugSphereTraceMulti(const UWorld* World, const FVector& Start, const 
 			DrawDebugPoint(World, Hit.ImpactPoint, 16.0f, (Hit.bBlockingHit ? TraceColor.ToFColor(true) : TraceHitColor.ToFColor(true)), bPersistent, LifeTime);
 		}
 	}
-}
+}*/
 
 TArray<AActor*> AChefCharacter::TraceAttack(FVector Start, FVector End)
 {
